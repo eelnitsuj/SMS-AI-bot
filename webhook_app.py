@@ -17,9 +17,7 @@ project_id = 'superbonsai-sms'
 topic_name = 'SMS'
 
 # Replace these values with your own
-openai_api_key = 'your_openai_api_key'
-gmail_user = 'your_gmail_address'
-gmail_password = 'your_gmail_password'
+openai_api_key = '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'
 
 @app.route('/', methods=['POST'])
 def webhook():
@@ -41,21 +39,23 @@ def webhook():
         return jsonify({'success': True}), 200
 
 def generate_response(text):
-    # Replace this with your OpenAI API call to generate a response
-    prompt = "Conversation with a customer:\n" + text + "\nResponse:"
     response = requests.post(
-        'https://api.openai.com/v1/engines/davinci-codex/completions',
-        headers={'Authorization': f'Bearer {openai_api_key}'},
+        'https://api.openai.com/v1/chat/completions',
+        headers={'Content-Type': 'application/json', 
+                'Authorization': f'Bearer {openai_api_key}'},
         json={
-            'prompt': prompt,
-            'max_tokens': 50,
-            'n': 1,
-            'stop': 'User:',
-            'temperature': 0.7,
-        },
+                "model": "gpt-3.5-turbo",
+                "messages": [{"role": "system", "content": "You are an AI apothecary and people want to contact you for your wisdom about earth’s natural bounties and cures."},
+                             {"role": "user", "content": {text}}
+                             ],
+                "temperature":0.2,
+                "max_tokens":100
+        }
+
     )
-    response_text = response.json()['choices'][0]['text'].strip()
+    response_text = response.json()['choices'][0]['message']['content'].strip()
     return response_text
+
 
 def send_response(response_text, recipient):
     # Replace this with your SMS API call to send the response to the recipient

@@ -31,7 +31,8 @@ def webhook():
         if not envelope:
             return jsonify({'error': 'Invalid request'}), 400
 
-        message = envelope.get('message')
+        message_bytes = base64.b64decode(envelope.get(['message']['data']))
+        message=message_bytes.decode('utf-8')
         if not message:
             return jsonify({'error': 'Invalid message'}), 400
 

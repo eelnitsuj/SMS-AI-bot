@@ -3,6 +3,7 @@ import requests
 import base64
 import json
 import pickle
+import time
 from flask import Flask, request, jsonify
 from google.cloud import pubsub_v1
 from google.oauth2.credentials import Credentials
@@ -49,6 +50,7 @@ def webhook():
         service = build('gmail', 'v1', credentials=creds)
 
         # Get the message using the message ID
+        time.sleep(5)
         message = service.users().messages().get(userId='me', id=message_id).execute()
         print(message)
         # Extract the message body

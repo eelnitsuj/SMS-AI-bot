@@ -60,6 +60,7 @@ def generate_response(text):
         }
     )
     response_text = response.json()['choices'][0]['message']['content'].strip()
+    print(response_text)
     return response_text
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080)

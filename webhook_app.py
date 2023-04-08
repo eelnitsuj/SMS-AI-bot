@@ -31,22 +31,25 @@ def webhook():
         if not envelope:
             return jsonify({'error': 'Invalid request'}), 400
 
+        #grab email message from payload and decode it
         message_bytes = base64.b64decode(envelope['message']['data'])
         message=message_bytes.decode('utf-8')
+        print(message)
         if not message:
             return jsonify({'error': 'Invalid message'}), 400
 
-        # Send the message to OPENAI's API
+        # Send the email message to OPENAI's API
         response_text = generate_response(message)
         #Send OPENAI's response via email back to sender. First grab sender_email and subject from pub/sub webhook
-        xmessage = MIMEMultipart()
-        sender_email = xmessage['to']
-        subject = xmessage['subject']
+        #xmessage = MIMEMultipart()
+        #sender_email = xmessage['to']
+        #subject = xmessage['subject']
         #send_email(response_text, sender_email, subject)
 
         return jsonify({'success': True}), 200
 
 def generate_response(text):
+    print(text)
     response = requests.post(
         'https://api.openai.com/v1/chat/completions',
         headers={'Content-Type': 'application/json', 

@@ -41,7 +41,7 @@ def webhook():
         message = MIMEMultipart()
         sender_email = message['to']
         subject = message['subject']
-        send_email(response_text, sender_email, subject)
+        #send_email(response_text, sender_email, subject)
 
         return jsonify({'success': True}), 200
 
@@ -61,30 +61,5 @@ def generate_response(text):
     )
     response_text = response.json()['choices'][0]['message']['content'].strip()
     return response_text
-
-def send_email(response_text, sender_email, subject):
-    try:
-        service = build('gmail', 'v1', credentials=Credentials.from_authorized_user_file('credentials.json', ['https://www.googleapis.com/auth/gmail.modify']))
-        
-        # Construct the email message
-        message = MIMEMultipart()
-        message['to'] = sender_email
-        message['subject'] = subject
-
-        # Attach the response text as the email body
-        text = MIMEText(response_text)
-        message.attach(text)
-
-        # Send the email
-        create_message = {'raw': base64.urlsafe_b64encode(message.as_bytes()).decode()}
-        send_message = (service.users().messages().send(userId="me", body=create_message).execute())
-        print(F'The email was sent to {sender_email} with email Id: {send_message["id"]}')
-        
-    except HttpError as error:
-        print(F'An error occurred: {error}')
-        send_message = None
-
-    return send_message
-
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080)

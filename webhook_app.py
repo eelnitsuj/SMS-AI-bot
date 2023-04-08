@@ -37,11 +37,11 @@ def webhook():
             return jsonify({'error': 'Invalid message'}), 400
 
         # Send the message to OPENAI's API
-        response_text = generate_response(message['data'])
+        response_text = generate_response(message)
         #Send OPENAI's response via email back to sender. First grab sender_email and subject from pub/sub webhook
-        message = MIMEMultipart()
-        sender_email = message['to']
-        subject = message['subject']
+        xmessage = MIMEMultipart()
+        sender_email = xmessage['to']
+        subject = xmessage['subject']
         #send_email(response_text, sender_email, subject)
 
         return jsonify({'success': True}), 200

@@ -32,7 +32,10 @@ def webhook():
             return jsonify({'error': 'Invalid request'}), 400
 
         #grab email message from payload and decode it
-        message_bytes = base64.b64decode(envelope['message']['data'])
+        message_code = envelope['message']['data']
+        print(message_code)
+        message_bytes = base64.b64decode(message_code)
+        print(message_bytes)
         message=message_bytes.decode('utf-8')
         print(message)
         if not message:

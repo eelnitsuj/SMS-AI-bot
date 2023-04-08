@@ -2,6 +2,7 @@ import os
 import requests
 import base64
 import json
+import pickle
 from flask import Flask, request, jsonify
 from google.cloud import pubsub_v1
 from google.oauth2.credentials import Credentials
@@ -10,6 +11,9 @@ from googleapiclient.errors import HttpError
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
+from google_auth_oauthlib.flow import InstalledAppFlow
+
+
 
 
 app = Flask(__name__)
@@ -41,11 +45,13 @@ def webhook():
         message_id = envelope['message']['messageId']
  
         # Authenticate with Gmail API
-        # Authenticate with Gmail API
-        with open('C:/Users/Justin/Pictures/SuperBonsai/SMS GMAIL BOT/credentials.json') as f:
-            creds = Credentials.from_authorized_user_info(info=json.load(f))
+        creds = Credentials.from_authorized_user_info(info={
+            "client_id": os.environ['client_id'],
+            "client_secret": os.environ['client_secret'],
+            "refresh_token": os.environ['refresh_token'],
+            "token_uri": "https://oauth2.googleapis.com/token",
+        })
         service = build('gmail', 'v1', credentials=creds)
-
 
         # Get the message using the message ID
         message = service.users().messages().get(userId='me', id=message_id).execute()

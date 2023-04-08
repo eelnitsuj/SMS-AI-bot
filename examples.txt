@@ -7,3 +7,40 @@
     'publish_time': '2023-04-08T09:30:51.652Z'},
     'subscription': 'projects/superbonsai-sms/subscriptions/herokuapp'
     }
+
+#google playground stuff
+Request / Response
+HTTP/1.1 302 Found
+Location: https://accounts.google.com/o/oauth2/v2/auth?redirect_uri=https%3A%2F%2Fdevelopers.google.com%2Foauthplayground&prompt=consent&response_type=code&client_id=407408718192.apps.googleusercontent.com&scope=https%3A%2F%2Fmail.google.com%2F+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fgmail.modify+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fgmail.send+https%3A%2F%2Fmail.google.com%2Fmail%2Ffeed%2Fatom&access_type=offline
+GET /oauthplayground/?code=4/0AVHEtk4xpL5DO35KpiooBJyJvxja7SDbP0le5d08RcoS4RUETNkB8veiGE2KxkCCEYqzXg&scope=https://mail.google.com/%20https://www.googleapis.com/auth/gmail.modify%20https://www.googleapis.com/auth/gmail.send HTTP/1.1
+Host: developers.google.com
+
+Authorization code
+4/0AVHEtk4xpL5DO35KpiooBJyJvxja7SDbP0le5d08RcoS4RUETNkB8veiGE2KxkCCEYqzXg
+Refresh token
+1//04Wagsmc6rUmUCgYIARAAGAQSNgF-L9IrwivSA-iv29K8p6RPMO84GW_C_0UnGbHKTpQyYTGsmXQc_dtueTXg152BZdltLXtALQ
+Access token
+ya29.a0Ael9sCNuD6UBGn8EDussOe26JFSAK1BZeHP01H-5x5n1EBBaISWOU9Wgwe5GbGEmHsrjntq4Pq8EDTGJ4Rc1fWzsc4x09eFqSsCjVK6NhR2dF5jI7qNU8sA01N8vfY5SurWAWtklm76F4NsBZKDQ41DgbxaqaCgYKAWESARESFQF4udJh2w68Oi_ABEgg5JOPWS1ICA0163
+
+HTTP/1.1 200 OK
+Content-length: 534
+X-xss-protection: 0
+X-content-type-options: nosniff
+Transfer-encoding: chunked
+Expires: Mon, 01 Jan 1990 00:00:00 GMT
+Vary: Origin, X-Origin, Referer
+Server: scaffolding on HTTPServer2
+-content-encoding: gzip
+Pragma: no-cache
+Cache-control: no-cache, no-store, max-age=0, must-revalidate
+Date: Sat, 08 Apr 2023 10:25:46 GMT
+X-frame-options: SAMEORIGIN
+Alt-svc: h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+Content-type: application/json; charset=utf-8
+{
+  "access_token": "ya29.a0Ael9sCNuD6UBGn8EDussOe26JFSAK1BZeHP01H-5x5n1EBBaISWOU9Wgwe5GbGEmHsrjntq4Pq8EDTGJ4Rc1fWzsc4x09eFqSsCjVK6NhR2dF5jI7qNU8sA01N8vfY5SurWAWtklm76F4NsBZKDQ41DgbxaqaCgYKAWESARESFQF4udJh2w68Oi_ABEgg5JOPWS1ICA0163", 
+  "scope": "https://www.googleapis.com/auth/gmail.modify https://mail.google.com/ https://www.googleapis.com/auth/gmail.send", 
+  "token_type": "Bearer", 
+  "expires_in": 3599, 
+  "refresh_token": "1//04Wagsmc6rUmUCgYIARAAGAQSNgF-L9IrwivSA-iv29K8p6RPMO84GW_C_0UnGbHKTpQyYTGsmXQc_dtueTXg152BZdltLXtALQ"
+}

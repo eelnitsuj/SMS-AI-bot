@@ -42,7 +42,7 @@ def webhook():
  
         # Authenticate with Gmail API
         # Authenticate with Gmail API
-        with open('C:\Users\Justin\Pictures\SuperBonsai\SMS GMAIL BOT\credentials.json') as f:
+        with open('C:/Users/Justin/Pictures/SuperBonsai/SMS GMAIL BOT/credentials.json') as f:
             creds = Credentials.from_authorized_user_info(info=json.load(f))
         service = build('gmail', 'v1', credentials=creds)
 

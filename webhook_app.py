@@ -36,11 +36,6 @@ def webhook():
         if not envelope:
             return jsonify({'error': 'Invalid request'}), 400
 
-        #grabs the email address and history ID from pubsub payload
-        message_code = envelope['message']['data']
-        message_bytes = base64.b64decode(message_code)
-        messagepubsub=message_bytes.decode('utf-8')
-        print(messagepubsub)
         #uses gmail API to grab email contents from the message ID derived above
         message_id = envelope['message']['messageId']
  
@@ -64,8 +59,6 @@ def webhook():
         print(message_text)
         # Send the email message to OPENAI's API
         response_text = generate_response(message_text)
-
-
 
         #Send OPENAI's response via email back to sender. First grab sender_email and subject from pub/sub webhook
         #xmessage = MIMEMultipart()
@@ -93,5 +86,15 @@ def generate_response(text):
     response_text = response.json()['choices'][0]['message']['content'].strip()
     print(response_text)
     return response_text
+
+def get_gmail():
+    creds = Credentials.from_authorized_user_info(info={
+        "client_id": os.environ['client_id'],
+        "client_secret": os.environ['client_secret'],
+        "refresh_token": os.environ['refresh_token'],
+        "token_uri": "https://oauth2.googleapis.com/token",
+    })
+    return build('gmail', 'v1', credentials=creds)
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080)

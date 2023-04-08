@@ -1,6 +1,7 @@
 import os
 import requests
 import base64
+import json
 from flask import Flask, request, jsonify
 from google.cloud import pubsub_v1
 from google.oauth2.credentials import Credentials
@@ -40,8 +41,11 @@ def webhook():
         message_id = envelope['message']['messageId']
  
         # Authenticate with Gmail API
-        creds = Credentials.from_authorized_user_info(info=requests.get('https://www.googleapis.com/oauth2/v1/userinfo?alt=json').json())
+        # Authenticate with Gmail API
+        with open('credentials.json') as f:
+            creds = Credentials.from_authorized_user_info(info=json.load(f))
         service = build('gmail', 'v1', credentials=creds)
+
 
         # Get the message using the message ID
         message = service.users().messages().get(userId='me', id=message_id).execute()

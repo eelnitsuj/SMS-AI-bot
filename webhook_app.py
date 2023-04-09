@@ -1,4 +1,5 @@
 import os
+import re
 import requests
 import base64
 import json
@@ -34,6 +35,8 @@ def webhook():
         # Extract the Cloud Pub/Sub message from the request
         envelope = request.get_json()
         print(envelope)
+        messages = remove_text(envelope)
+        print(messages)
         if not envelope:
             return jsonify({'error': 'Invalid request'}), 400
  
@@ -75,6 +78,13 @@ def generate_response(text):
     response_text = response.json()['choices'][0]['message']['content'].strip()
     print(response_text)
     return response_text
+
+def remove_text(input_string):
+    pattern = r'(?s)On .+?wrote:'
+    modified_string = re.sub(pattern, '', input_string)
+    while re.search(pattern, modified_string):
+        modified_string = re.sub(pattern, '', modified_string)
+    return modified_string
 
 def get_gmail():
     creds = Credentials.from_authorized_user_info(info={

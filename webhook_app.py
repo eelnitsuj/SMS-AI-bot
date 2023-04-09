@@ -35,7 +35,9 @@ def webhook():
         # Extract the Cloud Pub/Sub message from the request
         envelope = request.get_json()
         print(envelope)
-        messages = remove_text(envelope)
+        # Extract email content from the envelope
+        email_content = envelope.get('body_plain', '')
+        messages = remove_text(email_content)
         print(messages)
         if not envelope:
             return jsonify({'error': 'Invalid request'}), 400

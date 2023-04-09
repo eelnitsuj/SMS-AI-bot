@@ -24,7 +24,7 @@ project_id = 'superbonsai-sms'
 topic_name = 'SMS'
 
 # Replace these values with your own
-openai_api_key = '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'
+openai_api_key = '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'
 
 @app.route('/', methods=['POST'])
 def webhook():

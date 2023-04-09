@@ -34,7 +34,6 @@ def webhook():
     if request.method == 'POST':
         # Extract the Cloud Pub/Sub message from the request
         envelope = request.get_json()
-        print(envelope)
         # Extract email content from the envelope
         email_content = envelope.get('body_plain', '')
         messages = remove_text(email_content)
@@ -52,7 +51,7 @@ def webhook():
         service = build('gmail', 'v1', credentials=creds)
 
         # Send the email message to OPENAI's API
-        #response_text = generate_response(message_text)
+        response_text = generate_response(messages)
 
         #Send OPENAI's response via email back to sender. First grab sender_email and subject from pub/sub webhook
         #xmessage = MIMEMultipart()
@@ -70,7 +69,7 @@ def generate_response(text):
                 'Authorization': f'Bearer {openai_api_key}'},
         json={
                 "model": "gpt-3.5-turbo",
-                "messages": [{"role": "system", "content": "You are an AI apothecary and people want to contact you for your wisdom about earth’s natural bounties and cures.Make sure the responses are under 100 tokens"},
+                "messages": [{"role": "system", "content": "You are an AI apothecary and people want to contact you for your wisdom about earth’s natural bounties and cures. I am sending you the entire message conversation history between the customer and you. Make sure the responses are under 100 tokens"},
                              {"role": "user", "content": text}
                              ],
                 "temperature":0.2,

@@ -2,9 +2,6 @@ import os
 import re
 import requests
 import base64
-import json
-import pickle
-import time
 from flask import Flask, request, jsonify
 from google.cloud import pubsub_v1
 from google.oauth2.credentials import Credentials
@@ -89,10 +86,13 @@ def send_email(to, message_body, threadId):
     message['to'] = to
     message['subject'] = ''
     message['threadId'] = threadId
-
+    
+    # Convert the MIMEText object to a raw string (base64 encoded)
+    raw_message = base64.urlsafe_b64encode(message.as_bytes()).decode('utf-8')
+    
     try:
         # Send the reply message
-        send_message = service.users().messages().send(userId='me', body=message).execute()
+        send_message = service.users().messages().send(userId='me', body=raw_message, threadId=threadId).execute()
         print(f"Message Id: {send_message['id']}")
     except HttpError as error:
         print(f"An error occurred: {error}")

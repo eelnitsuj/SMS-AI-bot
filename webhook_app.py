@@ -92,7 +92,7 @@ def send_email(to, message_body, threadId):
     
     try:
         # Send the reply message
-        send_message = service.users().messages().send(userId='me', body=raw_message, threadId=threadId).execute()
+        send_message = service.users().messages().send(userId='me', body={'raw': raw_message, 'threadId': threadId}).execute()
         print(f"Message Id: {send_message['id']}")
     except HttpError as error:
         print(f"An error occurred: {error}")

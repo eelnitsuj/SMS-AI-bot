@@ -39,7 +39,8 @@ def webhook():
         messages = remove_text(email_content)
         print(messages)
         # Extract the sender email
-        sender = envelope.get('to', '')
+        sendercarrots = envelope.get('Return-Path', '')
+        sender = re.findall(r'<(.+?)>', sendercarrots)[0]
         print(sender)
         # Extract the threadId
         threadId = envelope.get('thread_id', '')

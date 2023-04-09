@@ -75,6 +75,7 @@ def generate_response(text):
                 "max_tokens":100
         }
     )
+    print(f"API response: {response.json()}")  # Add this line to print the resp
     response_text = response.json()['choices'][0]['message']['content'].strip()
     print(response_text)
     return response_text

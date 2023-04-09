@@ -86,6 +86,8 @@ def remove_text(input_string):
     modified_string = re.sub(pattern, '', input_string)
     while re.search(pattern, modified_string):
         modified_string = re.sub(pattern, '', modified_string)
+    # Remove excessive newlines
+    modified_string = re.sub(r'\n{2,}', '\n', modified_string)
     return modified_string
 
 def get_gmail():

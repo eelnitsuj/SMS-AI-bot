@@ -38,31 +38,23 @@ def webhook():
         email_content = envelope.get('body_plain', '')
         messages = remove_text(email_content)
         print(messages)
+        # Extract the sender email
+        sender = envelope.get('to', '')
+        print(sender)
+        # Extract the threadId
+        threadId = envelope.get('thread_id', '')
+        print(threadId)
         if not envelope:
             return jsonify({'error': 'Invalid request'}), 400
- 
-        # Authenticate with Gmail API
-        creds = Credentials.from_authorized_user_info(info={
-            "client_id": os.environ['client_id'],
-            "client_secret": os.environ['client_secret'],
-            "refresh_token": os.environ['refresh_token'],
-            "token_uri": "https://oauth2.googleapis.com/token",
-        })
-        service = build('gmail', 'v1', credentials=creds)
 
         # Send the email message to OPENAI's API
         response_text = generate_response(messages)
-
-        #Send OPENAI's response via email back to sender. First grab sender_email and subject from pub/sub webhook
-        #xmessage = MIMEMultipart()
-        #sender_email = xmessage['to']
-        #subject = xmessage['subject']
-        #send_email(response_text, sender_email, subject)
+        #Send Openai's response to gmail
+        send_email(sender,response_text,threadId)
 
         return jsonify({'success': True}), 200
 
 def generate_response(text):
-    print(text)
     response = requests.post(
         'https://api.openai.com/v1/chat/completions',
         headers={'Content-Type': 'application/json', 
@@ -79,6 +71,34 @@ def generate_response(text):
     response_text = response.json()['choices'][0]['message']['content'].strip()
     print(response_text)
     return response_text
+
+def send_email(to, message_body, threadId):
+    # Authenticate with Gmail API
+    creds = Credentials.from_authorized_user_info(info={
+        "client_id": os.environ['client_id'],
+        "client_secret": os.environ['client_secret'],
+        "refresh_token": os.environ['refresh_token'],
+        "token_uri": "https://oauth2.googleapis.com/token",
+    })
+    service = build('gmail', 'v1', credentials=creds)
+
+    # Construct the message payload
+    message = MIMEText(message_body)
+    message['to'] = to
+    message['subject'] = ''
+    message['threadId'] = threadId
+
+    try:
+        # Send the reply message
+        send_message = service.users().messages().send(userId='me', body=message).execute()
+        print(f"Message Id: {send_message['id']}")
+    except HttpError as error:
+        print(f"An error occurred: {error}")
+        send_message = None
+
+    return send_message
+
+
 
 def remove_text(input_string):
     pattern = r'(?s)On .+?wrote:'

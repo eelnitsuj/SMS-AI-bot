@@ -31,13 +31,21 @@ def webhook():
     if request.method == 'POST':
         # Extract the Cloud Pub/Sub message from the request
         envelope = request.get_json()
+        
+        # Extract the sender email
+        sendercarrots = envelope.get('from', {})
+        sender = sendercarrots.get('email','')
+
+        # Make sure it's not a reply
+        unacceptable_email = 'urbanboyclothes@gmail.com'
+        if sender == unacceptable_email:
+            return jsonify({'error': 'Unacceptable sender'}), 400
+        
         # Extract email content from the envelope
         email_content = envelope.get('body_plain', '')
         messages = remove_text(email_content)
         print(messages)
-        # Extract the sender email
-        sendercarrots = envelope.get('from', {})
-        sender = sendercarrots.get('email','')
+        
         #sender = re.findall(r'<(.+?)>', sendercarrots)[0]
         print(sender)
         # Extract the threadId

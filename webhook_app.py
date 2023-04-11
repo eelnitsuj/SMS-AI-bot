@@ -150,12 +150,6 @@ def get_emails_from_sender(sender_email, service):
         print(f"An error occurred: {error}")
         return None
 
-sender_email = "example@example.com"
-emails_from_sender = get_emails_from_sender(sender_email)
-
-for email in emails_from_sender:
-    print(email)
-
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080)
     

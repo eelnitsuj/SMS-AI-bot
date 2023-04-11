@@ -11,20 +11,16 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
 from google_auth_oauthlib.flow import InstalledAppFlow
-
-
-
-
 app = Flask(__name__)
 
-# Replace this with your Google Cloud project ID
+# Google Cloud project ID
 project_id = 'superbonsai-sms'
 
-# Replace this with your Cloud Pub/Sub topic name
+# Cloud Pub/Sub topic name
 topic_name = 'SMS'
 
-# Replace these values with your own
-openai_api_key = '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'
+# OpenAI API key from Heroku env
+openai_api_key = os.environ['openai_api_key']
 
 @app.route('/', methods=['POST'])
 def webhook():

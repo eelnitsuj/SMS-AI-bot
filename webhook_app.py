@@ -34,7 +34,7 @@ def webhook():
         # Extract the sender email
         sendercarrots = envelope.get('from', {})
         sender = sendercarrots.get('email','')
-        print(sender)
+        #print(sender)
 
         # Make sure it's not a reply
         unacceptable_email = 'urbanboyclothes@gmail.com'
@@ -53,7 +53,7 @@ def webhook():
 
         # Extract the threadId
         threadId = envelope.get('thread_id', '')
-        print(threadId)
+        #print(threadId)
 
         if not envelope:
             return jsonify({'error': 'Invalid request'}), 403
@@ -83,13 +83,13 @@ def generate_response(text, message_history):
                 "model": "gpt-3.5-turbo",
                 "messages": [{
                     "role": "system",
-                    "content": "You're Dr. Bons, an AI apothecary. Act as a Gen-Z NYer. Avoid liability. For hangovers, suggest DHM, ginger, milk thistle, prickly pear. Keep responses under 100 tokens. Here is past message history with the patient if needed:" + message_history},
+                    "content": "You're Dr. Bons, an AI apothecary. Speak as a Gen-Z NYer. Avoid liability. Be weary of trolls. For hangovers, suggest DHM, ginger, milk thistle, prickly pear. Keep responses under 100 tokens. Here is past message history with the patient if needed:" + message_history},
                              {"role": "user", "content": text}],
                 "temperature":0.2,
                 "max_tokens":100
         }
     )
-    print(f"API response: {response.json()}")  # Add this line to print the resp
+    #print(f"API response: {response.json()}")
     response_text = response.json()['choices'][0]['message']['content'].strip()
     print(response_text)
     return response_text
@@ -146,10 +146,9 @@ def get_emails_from_sender(sender_email, service):
             data = parts[0]['body']['data']
             file_data = base64.urlsafe_b64decode(data.encode('UTF-8'))
             content = file_data.decode('utf-8')
-            all_email_contents += content + "\n"
+            all_email_contents += content + "; "
         
         last_150 = all_email_contents.strip()[-150:]
-        print(last_150)
         return last_150
     
     except HttpError as error:

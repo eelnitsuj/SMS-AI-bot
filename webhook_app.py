@@ -39,7 +39,7 @@ def webhook():
         # Make sure it's not a reply
         unacceptable_email = 'urbanboyclothes@gmail.com'
         if sender == unacceptable_email:
-            return jsonify({'error': 'Unacceptable sender'}), 400
+            return jsonify({'error': 'Stop talking to yourself!'}), 400
         
         # Extract email content from the envelope
         email_content = envelope.get('body_plain', '')
@@ -47,9 +47,9 @@ def webhook():
         print(messages)
 
         #Make sure it's not a reaction text
-        invalid_starts = ["loved \"", "liked \"", "disliked \""]
+        invalid_starts = ["Loved \"", "Liked \"", "Disliked \"","Laughed \"","Questioned \""]
         if any(messages.startswith(phrase) for phrase in invalid_starts):
-            return jsonify({'error': 'Invalid message'}), 400
+            return jsonify({'error': 'Just a reaction'}), 400
         
         #sender = re.findall(r'<(.+?)>', sendercarrots)[0]
         print(sender)
@@ -137,3 +137,4 @@ def get_gmail():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080)
+    

@@ -61,7 +61,7 @@ def webhook():
         # Send the email message to OPENAI's API
         response_text = generate_response(messages, message_history)
         #Send Openai's response to gmail
-        send_email(sender,response_text,threadId)
+        send_email(sender,response_text,threadId, service)
         return jsonify({'success': True}), 200
 
 def generate_response(text, message_history):
@@ -138,10 +138,10 @@ def get_emails_from_sender(sender_email, service):
             content = file_data.decode('utf-8')
             all_email_contents += content + "\n"
         
-        print(all_email_contents.strip()[-400:])
-        last_400 = all_email_contents.strip()[-400:]
-        return last_400.strip()
-
+        last_200 = all_email_contents.strip()[-200:]
+        print(last_200)
+        return last_200
+    
     except HttpError as error:
         print(f"An error occurred: {error}")
         return None

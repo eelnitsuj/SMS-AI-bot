@@ -47,10 +47,17 @@ def webhook():
         print(messages)
 
         #Make sure it's not a reaction text
-        invalid_starts = ["Loved \"", "Liked \"", "Disliked \"","Laughed \"","Questioned \""]
+        invalid_starts = [
+            "Loved \"", "Loved “",
+            "Liked \"", "Liked “",
+            "Disliked \"", "Disliked “",
+            "Laughed \"", "Laughed “",
+            "Questioned \"", "Questioned “"
+        ]
+
         if any(messages.startswith(phrase) for phrase in invalid_starts):
             return jsonify({'error': 'Just a reaction'}), 400
-        
+                
         #sender = re.findall(r'<(.+?)>', sendercarrots)[0]
         print(sender)
         # Extract the threadId

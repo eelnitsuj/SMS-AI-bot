@@ -35,45 +35,40 @@ def webhook():
         # Extract the sender email
         sendercarrots = envelope.get('from', {})
         sender = sendercarrots.get('email','')
+        print(sender)
 
         # Make sure it's not a reply
         unacceptable_email = 'urbanboyclothes@gmail.com'
         if sender == unacceptable_email:
             return jsonify({'error': 'Stop talking to yourself!'}), 400
-        
+
         # Extract email content from the envelope
         email_content = envelope.get('body_plain', '')
         messages = remove_text(email_content)
         print(messages)
 
         #Make sure it's not a reaction text
-        invalid_starts = [
-            "Loved \"", "Loved “",
-            "Liked \"", "Liked “",
-            "Disliked \"", "Disliked “",
-            "Laughed \"", "Laughed “",
-            "Questioned \"", "Questioned “"
-        ]
-
+        invalid_starts = ["Loved “", "Liked “", "Disliked “", "Laughed “", "Emphasized “", "Questioned “"]
         if any(messages.startswith(phrase) for phrase in invalid_starts):
             return jsonify({'error': 'Just a reaction'}), 400
-                
-        #sender = re.findall(r'<(.+?)>', sendercarrots)[0]
-        print(sender)
+
         # Extract the threadId
         threadId = envelope.get('thread_id', '')
         print(threadId)
         if not envelope:
             return jsonify({'error': 'Invalid request'}), 400
-
+        #Authenticate GMAIL API
+        service=get_gmail()
+        #Grab the message history
+        message_history=get_emails_from_sender(sender, service)
+        print(message_history)
         # Send the email message to OPENAI's API
-        response_text = generate_response(messages)
+        response_text = generate_response(messages, message_history)
         #Send Openai's response to gmail
         send_email(sender,response_text,threadId)
-
         return jsonify({'success': True}), 200
 
-def generate_response(text):
+def generate_response(text, message_history):
     response = requests.post(
         'https://api.openai.com/v1/chat/completions',
         headers={'Content-Type': 'application/json', 
@@ -82,7 +77,7 @@ def generate_response(text):
                 "model": "gpt-3.5-turbo",
                 "messages": [{
                     "role": "system",
-                    "content": "You're Dr. Bons, an AI apothecary. Reference Dr. Sebi, Huberman Labs. Act as a Gen-Z NYer, avoid liability. For hangovers, suggest DHM, ginger, milk thistle, prickly pear. Keep responses under 100 tokens"},
+                    "content": "You're Dr. Bons, an AI apothecary. Act as a Gen-Z NYer. Avoid liability. For hangovers, suggest DHM, ginger, milk thistle, prickly pear. Keep responses under 100 tokens. Here is past message history with the patient if needed:" + message_history},
                              {"role": "user", "content": text}],
                 "temperature":0.2,
                 "max_tokens":100
@@ -93,16 +88,7 @@ def generate_response(text):
     print(response_text)
     return response_text
 
-def send_email(to, message_body, threadId):
-    # Authenticate with Gmail API
-    creds = Credentials.from_authorized_user_info(info={
-        "client_id": os.environ['client_id'],
-        "client_secret": os.environ['client_secret'],
-        "refresh_token": os.environ['refresh_token'],
-        "token_uri": "https://oauth2.googleapis.com/token",
-    })
-    service = build('gmail', 'v1', credentials=creds)
-
+def send_email(to, message_body, threadId, service):
     # Construct the message payload
     message = MIMEText(message_body)
     message['to'] = to
@@ -122,8 +108,6 @@ def send_email(to, message_body, threadId):
 
     return send_message
 
-
-
 def remove_text(input_string):
     pattern = r'(?s)On .+?wrote:'
     modified_string = re.sub(pattern, '', input_string)
@@ -141,6 +125,36 @@ def get_gmail():
         "token_uri": "https://oauth2.googleapis.com/token",
     })
     return build('gmail', 'v1', credentials=creds)
+
+def get_emails_from_sender(sender_email, service):
+    try:
+        query = f"from:{sender_email}"
+        results = service.users().messages().list(userId='me', q=query).execute()
+        messages = results.get('messages', [])
+
+        all_email_contents = ""
+
+        for message in messages:
+            msg = service.users().messages().get(userId='me', id=message['id']).execute()
+            parts = msg['payload']['parts']
+            data = parts[0]['body']['data']
+            file_data = base64.urlsafe_b64decode(data.encode('UTF-8'))
+            content = file_data.decode('utf-8')
+            all_email_contents += content + "\n"
+        
+        print(all_email_contents.strip())
+        return all_email_contents.strip()
+        
+
+    except HttpError as error:
+        print(f"An error occurred: {error}")
+        return None
+
+sender_email = "example@example.com"
+emails_from_sender = get_emails_from_sender(sender_email)
+
+for email in emails_from_sender:
+    print(email)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080)

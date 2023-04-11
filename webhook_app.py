@@ -2,6 +2,7 @@ import os
 import re
 import requests
 import base64
+import time
 from flask import Flask, request, jsonify
 from google.cloud import pubsub_v1
 from google.oauth2.credentials import Credentials
@@ -12,6 +13,8 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
 from google_auth_oauthlib.flow import InstalledAppFlow
 app = Flask(__name__)
+
+start_time = time.time()
 
 # Google Cloud project ID
 project_id = 'superbonsai-sms'
@@ -25,7 +28,7 @@ openai_api_key = os.environ['openai_api_key']
 @app.route('/', methods=['POST'])
 def webhook():
     if request.method == 'POST':
-        # Extract the Cloud Pub/Sub message from the request
+        # Extract the message from the request
         envelope = request.get_json()
         
         # Extract the sender email
@@ -36,7 +39,7 @@ def webhook():
         # Make sure it's not a reply
         unacceptable_email = 'urbanboyclothes@gmail.com'
         if sender == unacceptable_email:
-            return jsonify({'error': 'Stop talking to yourself!'}), 400
+            return jsonify({'error': 'Stop talking to yourself!'}), 469
 
         # Extract email content from the envelope
         email_content = envelope.get('body_plain', '')
@@ -46,22 +49,29 @@ def webhook():
         #Make sure it's not a reaction text
         invalid_starts = ["Loved “", "Liked “", "Disliked “", "Laughed “", "Emphasized “", "Questioned “"]
         if any(messages.startswith(phrase) for phrase in invalid_starts):
-            return jsonify({'error': 'Just a reaction'}), 400
+            return jsonify({'error': 'Just a reaction'}), 469
 
         # Extract the threadId
         threadId = envelope.get('thread_id', '')
         print(threadId)
+
         if not envelope:
-            return jsonify({'error': 'Invalid request'}), 400
+            return jsonify({'error': 'Invalid request'}), 403
+        
+        print(time.time()-start_time)
         #Authenticate GMAIL API
         service=get_gmail()
+        print(time.time()-start_time)
         #Grab the message history
         message_history=get_emails_from_sender(sender, service)
         print(message_history)
+        print(time.time()-start_time)
         # Send the email message to OPENAI's API
         response_text = generate_response(messages, message_history)
+        print(time.time()-start_time)
         #Send Openai's response to gmail
         send_email(sender,response_text,threadId, service)
+        print(time.time()-start_time)
         return jsonify({'success': True}), 200
 
 def generate_response(text, message_history):
@@ -138,9 +148,9 @@ def get_emails_from_sender(sender_email, service):
             content = file_data.decode('utf-8')
             all_email_contents += content + "\n"
         
-        last_200 = all_email_contents.strip()[-200:]
-        print(last_200)
-        return last_200
+        last_150 = all_email_contents.strip()[-150:]
+        print(last_150)
+        return last_150
     
     except HttpError as error:
         print(f"An error occurred: {error}")

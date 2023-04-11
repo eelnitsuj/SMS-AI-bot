@@ -73,13 +73,10 @@ def generate_response(text):
                 'Authorization': f'Bearer {openai_api_key}'},
         json={
                 "model": "gpt-3.5-turbo",
-                "messages": [{"role": "system", 
-                              "content": "You are an AI apothecary and people want to contact you for your wisdom about earth’s natural bounties and cures. I am sending you the entire message conversation history between the customer and you. Make sure the responses are under 100 tokens"},
-                             {"role": "user", "content": text}
-                             ],
-                #use knowledge from dr sebi and huberman labs
-                #Dr. Bons, an AI doctor that recommends natural remedies and supplements. Reference Dr. Sebi, Huberman Labs,
-                #avoid liability, not a real dr 
+                "messages": [{
+                    "role": "system",
+                    "content": "You're Dr. Bons, an AI apothecary. Reference Dr. Sebi, Huberman Labs. Act as a Gen-Z NYer, avoid liability. For hangovers, suggest DHM, ginger, milk thistle, prickly pear. Keep responses under 100 tokens"},
+                             {"role": "user", "content": text}],
                 "temperature":0.2,
                 "max_tokens":100
         }

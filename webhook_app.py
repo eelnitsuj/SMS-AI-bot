@@ -138,9 +138,9 @@ def get_emails_from_sender(sender_email, service):
             content = file_data.decode('utf-8')
             all_email_contents += content + "\n"
         
-        print(all_email_contents.strip())
-        return all_email_contents.strip()
-        
+        print(all_email_contents.strip()[-400:])
+        last_400 = all_email_contents.strip()[-400:]
+        return last_400.strip()
 
     except HttpError as error:
         print(f"An error occurred: {error}")

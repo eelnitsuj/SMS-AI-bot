@@ -23,11 +23,12 @@ def get_emails_from_sender(service, sender):
         query = f"from:{sender}"
         response = service.users().messages().list(userId='me', q=query).execute()
         messages = response.get('messages', [])
-        email_conversations = []
+        email_conversations = ""
 
         for message in messages:
             msg = service.users().messages().get(userId='me', id=message['id']).execute()
-            email_conversations.append(msg)
+            snippet = msg.get('snippet', '')
+            email_conversations += snippet + "\n"
 
         last_150 = email_conversations[-150:]
         return last_150
@@ -36,16 +37,14 @@ def get_emails_from_sender(service, sender):
         print(f"An error occurred: {error}")
         return None
 
-
 def main():
     sender_email = "conversations+293285851@mg.postscriptapp.com"
     service = get_gmail()
-    email_conversations = get_emails_from_sender(service, sender_email)
+    email_history = get_emails_from_sender(service, sender_email)
 
-    if email_conversations:
-        print(f"Total emails from {sender_email}: {len(email_conversations)}")
-        for email in email_conversations:
-            print(f"Subject: {email['snippet']}\n")
+    if email_history:
+        print(f"Total emails from {sender_email}: {len(email_history)}")
+        print(email_history)
     else:
         print("No emails found.")
 

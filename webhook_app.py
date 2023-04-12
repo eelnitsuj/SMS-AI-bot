@@ -79,15 +79,15 @@ def generate_response(text, message_history):
                 "model": "gpt-3.5-turbo",
                 "messages": [{
                     "role": "system",
-                    "content": "You're Dr. Bons, a AI apothecary from NY.Avoid liability. Use Gen-z language and tone. Be weary of trolls. For hangovers, suggest DHM, ginger, milk thistle, prickly pear. Keep responses under 100 tokens. Here is past message history with the patient if needed:" + message_history},
+                    "content": "You're Dr. Bons, a AI apothecary from NY. Avoid liability. Use Gen-Z language and tone. Be weary of trolls. For hangovers, suggest DHM, ginger, milk thistle, prickly pear. Ensure responses under 100 tokens. Here is past message history with the patient:" + message_history},
                              {"role": "user", "content": text}],
                 "temperature":0.2,
                 "max_tokens":100
         }
     )
-    #print(f"API response: {response.json()}")
-    response_text = response.json()['choices'][0]['message']['content'].strip()
-    print(response_text)
+    print(f"API response: {response.json()}")
+    response_text = response.json()['choices'][0]['message']['content']
+    #print(response_text)
     return response_text
 
 def send_email(to, message_body, threadId, service):

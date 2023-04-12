@@ -137,7 +137,7 @@ def get_emails_from_sender(sender_email, service):
             msg = service.users().messages().get(userId='me', id=message['id']).execute()
             email_conversations.append(msg)
         
-        last_150 = email_conversations.strip()[-150:]
+        last_150 = email_conversations[-150:]
         return last_150
     
     except HttpError as error:

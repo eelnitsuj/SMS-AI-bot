@@ -107,7 +107,6 @@ def send_email(to, message_body, threadId, service):
     try:
         # Send the reply message
         send_message = service.users().messages().send(userId='me', body={'raw': raw_message, 'threadId': threadId}).execute()
-        print(f"Message Id: {send_message['id']}")
     except HttpError as error:
         print(f"An error occurred: {error}")
         send_message = None
@@ -137,18 +136,13 @@ def get_emails_from_sender(sender_email, service):
         query = f"from:{sender_email}"
         results = service.users().messages().list(userId='me', q=query).execute()
         messages = results.get('messages', [])
-
-        all_email_contents = ""
+        email_conversations = []
 
         for message in messages:
             msg = service.users().messages().get(userId='me', id=message['id']).execute()
-            parts = msg['payload']['parts']
-            data = parts[0]['body']['data']
-            file_data = base64.urlsafe_b64decode(data.encode('UTF-8'))
-            content = file_data.decode('utf-8')
-            all_email_contents += content + "; "
+            email_conversations.append(msg)
         
-        last_150 = all_email_contents.strip()[-150:]
+        last_150 = email_conversations.strip()[-150:]
         return last_150
     
     except HttpError as error:

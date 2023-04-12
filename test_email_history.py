@@ -17,21 +17,21 @@ def get_gmail():
 
     return build('gmail', 'v1', credentials=creds)
 
-
 def get_emails_from_sender(service, sender):
     try:
         query = f"from:{sender}"
         response = service.users().messages().list(userId='me', q=query).execute()
         messages = response.get('messages', [])
-        email_conversations = ""
+        
+        email_snippets = []
 
-        for message in messages:
+        for message in messages[:4]:
             msg = service.users().messages().get(userId='me', id=message['id']).execute()
             snippet = msg.get('snippet', '')
-            email_conversations += snippet + "\n"
+            email_snippets.append(snippet)
 
-        last_150 = email_conversations[-150:]
-        return last_150
+        email_conversations = "\n".join(email_snippets)
+        return email_conversations
     
     except HttpError as error:
         print(f"An error occurred: {error}")

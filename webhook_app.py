@@ -58,20 +58,15 @@ def webhook():
         if not envelope:
             return jsonify({'error': 'Invalid request'}), 403
         
-        print(time.time()-start_time)
         #Authenticate GMAIL API
         service=get_gmail()
-        print(time.time()-start_time)
         #Grab the message history
         message_history=get_emails_from_sender(sender, service)
         print(message_history)
-        print(time.time()-start_time)
         # Send the email message to OPENAI's API
         response_text = generate_response(messages, message_history)
-        print(time.time()-start_time)
         #Send Openai's response to gmail
         send_email(sender,response_text,threadId, service)
-        print(time.time()-start_time)
         return jsonify({'success': True}), 200
 
 def generate_response(text, message_history):

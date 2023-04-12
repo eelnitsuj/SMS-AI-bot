@@ -126,7 +126,7 @@ def get_gmail():
     })
     return build('gmail', 'v1', credentials=creds)
 
-def get_emails_from_sender(service, sender):
+def get_emails_from_sender(sender, service):
     try:
         query = f"from:{sender}"
         response = service.users().messages().list(userId='me', q=query).execute()

@@ -91,22 +91,25 @@ def generate_response(text, message_history):
     return response_text
 
 def send_email(to, message_body, threadId, service):
+    # Replace newline characters before creating the MIMEText object
+    message_body = message_body.replace('\n', ' ').replace('\r', '')
+
     # Construct the message payload
     message = MIMEText(message_body)
     message['to'] = to
     message['subject'] = ''
     message['threadId'] = threadId
-    
+
     # Convert the MIMEText object to a raw string (base64 encoded)
     raw_message = base64.urlsafe_b64encode(message.as_bytes()).decode('utf-8')
-    
+
     try:
         # Send the reply message
         send_message = service.users().messages().send(userId='me', body={'raw': raw_message, 'threadId': threadId}).execute()
     except HttpError as error:
         print(f"An error occurred: {error}")
         send_message = None
-    message = message.replace('\n', ' ').replace('\r', '')
+
     return send_message
 
 def remove_text(input_string):

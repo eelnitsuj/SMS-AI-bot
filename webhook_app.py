@@ -106,7 +106,7 @@ def send_email(to, message_body, threadId, service):
     except HttpError as error:
         print(f"An error occurred: {error}")
         send_message = None
-
+    message = message.replace('\n', ' ').replace('\r', '')
     return send_message
 
 def remove_text(input_string):

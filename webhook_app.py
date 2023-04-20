@@ -38,8 +38,9 @@ def webhook():
 
         # Make sure it's not a reply
         unacceptable_email = 'urbanboyclothes@gmail.com'
-        if sender == unacceptable_email:
-            return jsonify({'error': 'Stop talking to yourself!'}), 469
+        unacceptable_email_2 = 'alerts@mail.zapier.com'
+        if sender == unacceptable_email | unacceptable_email_2 | 'alerts+noreply@mail.zapier.com':
+            return jsonify({'error': 'Stop talking to yourself!'}), 468
 
         # Extract email content from the envelope
         email_content = envelope.get('body_plain', '')
@@ -79,7 +80,7 @@ def generate_response(text, message_history):
                 "model": "gpt-3.5-turbo",
                 "messages": [{
                     "role": "system",
-                    "content": "You're the designated drinking buddy wingman. Avoid liability. Use Gen-Z language and tone. Be weary of trolls. Answer things only related to partying/alcohol/nightlife. For hangovers, suggest DHM, ginger, milk thistle, prickly pear. Ensure responses under 100 tokens. Here is past message history with the patient:" + message_history},
+                    "content": "You're the designated drinking buddy wingman. Avoid liability and giving medical advice. Use Gen-Z language and tone. Be weary of trolls. Answer things only related to partying/alcohol/nightlife. For hangovers, suggest DHM, ginger, milk thistle, prickly pear. Ensure responses under 100 tokens. Here is past message history with the patient:" + message_history},
                              {"role": "user", "content": text}],
                 "temperature":0.2,
                 "max_tokens":100

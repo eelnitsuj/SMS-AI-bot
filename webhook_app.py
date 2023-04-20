@@ -79,7 +79,7 @@ def generate_response(text, message_history):
                 "model": "gpt-3.5-turbo",
                 "messages": [{
                     "role": "system",
-                    "content": "You're Dr. Bons, a AI apothecary from NY. Avoid liability. Use Gen-Z language and tone. Be weary of trolls. For hangovers, suggest DHM, ginger, milk thistle, prickly pear. Ensure responses under 100 tokens. Here is past message history with the patient:" + message_history},
+                    "content": "You're a AI herbal apothecary from NY. Avoid liability. Use Gen-Z language and tone. Be weary of trolls. For hangovers, suggest DHM, ginger, milk thistle, prickly pear. Ensure responses under 100 tokens. Here is past message history with the patient:" + message_history},
                              {"role": "user", "content": text}],
                 "temperature":0.2,
                 "max_tokens":100

@@ -141,7 +141,7 @@ def get_emails_from_sender(sender, service):
         
         email_snippets = []
 
-        for message in messages[:4]:
+        for message in messages[:3]:
             msg = service.users().messages().get(userId='me', id=message['id']).execute()
             snippet = msg.get('snippet', '')
             email_snippets.append(snippet)

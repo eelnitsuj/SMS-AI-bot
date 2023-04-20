@@ -39,8 +39,10 @@ def webhook():
         # Make sure it's not a reply
         unacceptable_email = 'urbanboyclothes@gmail.com'
         unacceptable_email_2 = 'alerts@mail.zapier.com'
-        if sender == unacceptable_email | unacceptable_email_2 | 'alerts+noreply@mail.zapier.com':
+
+        if sender in (unacceptable_email, unacceptable_email_2, 'alerts+noreply@mail.zapier.com'):
             return jsonify({'error': 'Stop talking to yourself!'}), 468
+
 
         # Extract email content from the envelope
         email_content = envelope.get('body_plain', '')

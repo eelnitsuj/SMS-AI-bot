@@ -17,6 +17,8 @@ twilio_phone_number = os.environ['TWILIO_PHONE_NUMBER']
 # OpenAI API key from Heroku env
 openai_api_key = os.environ['openai_api_key']
 
+conversation_history = []
+
 @app.route('/', methods=['POST'])
 def webhook():
     if request.method == 'POST':
@@ -38,24 +40,36 @@ def webhook():
         return jsonify({'success': True}), 200
 
 def generate_response(text):
+    global conversation_history
+
+    # Add user message to conversation history
+    add_message_to_history("user", text)
+
+    # API call with conversation history
     response = requests.post(
         'https://api.openai.com/v1/chat/completions',
         headers={'Content-Type': 'application/json', 
                 'Authorization': f'Bearer {openai_api_key}'},
         json={
-                "model": "gpt-3.5-turbo",
-                "messages": [{
-                    "role": "system",
-                    "content": "You're the designated drinking buddy wingman. Avoid liability and giving medical advice and never encourage bad behaviour. Use Gen-Z language and tone. Be weary of trolls. Answer things only related to partying/alcohol/nightlife. For hangovers, suggest DHM, ginger, milk thistle, prickly pear. Ensure responses under 100 tokens."},
-                             {"role": "user", "content": text}],
-                "temperature":0.2,
-                "max_tokens":100
+            "model": "gpt-3.5-turbo",
+            "messages": conversation_history,
+            "temperature": 0.2,
+            "max_tokens": 100
         }
     )
+    print(conversation_history)
     print(f"API response: {response.json()}")
     response_text = response.json()['choices'][0]['message']['content']
-    #print(response_text)
+
+    # Add assistant response to conversation history
+    add_message_to_history("assistant", response_text)
+
     return response_text
+
+
+def add_message_to_history(role, content):
+    global conversation_history
+    conversation_history.append({"role": role, "content": content})
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080)

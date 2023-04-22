@@ -23,7 +23,7 @@ def is_subscriber_opted_in(conn, phone_number):
     result = cur.fetchone()
     return result and result[0] == 1
 
-def create_table(conn):
+def create_tables(conn):
     cursor = conn.cursor()
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS subscribers (

@@ -1,7 +1,7 @@
 import os
 from flask import Flask, request, jsonify
 from twilio.rest import Client
-from database import create_connection, add_subscriber, remove_subscriber, is_subscriber_opted_in, create_table
+from database import create_connection, add_subscriber, remove_subscriber, is_subscriber_opted_in, create_tables
 from chatgpt import generate_response
 
 app = Flask(__name__)
@@ -14,7 +14,10 @@ twilio_auth_token = os.environ['TWILIO_AUTH_TOKEN']
 twilio_phone_number = os.environ['TWILIO_PHONE_NUMBER']
 #create connection and table
 conn = create_connection('database.db')
-create_table(conn)
+print("Creating tables...")
+create_tables(conn)
+print("Tables created.")
+
 
 @app.route('/', methods=['POST'])
 def webhook():

@@ -1,8 +1,8 @@
 import os
 from flask import Flask, request, jsonify
 from twilio.rest import Client
-from database import create_connection, add_subscriber, remove_subscriber, is_subscriber_opted_in
-from gpt3 import generate_response
+from src.database import create_connection, add_subscriber, remove_subscriber, is_subscriber_opted_in
+from src.openai_api import generate_response
 
 app = Flask(__name__)
 

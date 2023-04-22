@@ -13,7 +13,7 @@ twilio_auth_token = os.environ['TWILIO_AUTH_TOKEN']
 # Twilio phone number
 twilio_phone_number = os.environ['TWILIO_PHONE_NUMBER']
 #create connection and table
-conn = create_connection()
+conn = create_connection('database.db')
 create_table(conn)
 
 @app.route('/', methods=['POST'])

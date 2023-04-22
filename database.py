@@ -1,10 +1,8 @@
 import sqlite3
 
-def create_connection():
-    conn = sqlite3.connect("subscribers.db")
+def create_connection(database):
+    conn = sqlite3.connect(database)
     return conn
-
-
 
 def add_subscriber(conn, phone_number):
     query = "INSERT INTO subscribers (phone_number, opted_in, opted_in_at) VALUES (?, 1, datetime('now'))"

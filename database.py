@@ -1,12 +1,10 @@
 import sqlite3
 
-def create_connection(db_file):
-    conn = None
-    try:
-        conn = sqlite3.connect(db_file)
-    except sqlite3.Error as e:
-        print(e)
+def create_connection():
+    conn = sqlite3.connect("subscribers.db")
     return conn
+
+
 
 def add_subscriber(conn, phone_number):
     query = "INSERT INTO subscribers (phone_number, opted_in, opted_in_at) VALUES (?, 1, datetime('now'))"
@@ -26,3 +24,14 @@ def is_subscriber_opted_in(conn, phone_number):
     cur.execute(query, (phone_number,))
     result = cur.fetchone()
     return result and result[0] == 1
+
+def create_table(conn):
+    cursor = conn.cursor()
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS subscribers (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            phone_number TEXT NOT NULL UNIQUE,
+            opted_in BOOLEAN DEFAULT 1
+        )
+    """)
+    conn.commit()

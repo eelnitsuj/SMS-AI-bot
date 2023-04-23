@@ -4,7 +4,7 @@ import requests
 import base64
 import time
 from flask import Flask, request, jsonify
-from google.cloud import pubsub_v1
+#from google.cloud import pubsub_v1
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
@@ -24,6 +24,7 @@ topic_name = 'SMS'
 
 # OpenAI API key from Heroku env
 openai_api_key = os.environ['openai_api_key']
+conversation_history = []
 
 @app.route('/', methods=['POST'])
 def webhook():
@@ -72,25 +73,34 @@ def webhook():
         #Send Openai's response to gmail
         send_email(sender,response_text,threadId, service)
         return jsonify({'success': True}), 200
+def generate_response(text):
+    global conversation_history
 
-def generate_response(text, message_history):
+    # Add user message to conversation history
+    add_message_to_history("user", text)
+
+    # API call with conversation history
     response = requests.post(
         'https://api.openai.com/v1/chat/completions',
         headers={'Content-Type': 'application/json', 
                 'Authorization': f'Bearer {openai_api_key}'},
         json={
-                "model": "gpt-3.5-turbo",
-                "messages": [{
-                    "role": "system",
-                    "content": "You're the designated drinking buddy wingman. Avoid liability and giving medical advice and never encourage bad behaviour. Use Gen-Z language and tone. Be weary of trolls. Answer things only related to partying/alcohol/nightlife. For hangovers, suggest DHM, ginger, milk thistle, prickly pear. Ensure responses under 100 tokens. Here is past message history with the patient:" + message_history},
-                             {"role": "user", "content": text}],
-                "temperature":0.2,
-                "max_tokens":100
+            "model": "gpt-3.5-turbo",
+            "messages": conversation_history,
+            "messages": [{
+                "role": "system",
+                "content": "You're the designated drinking buddy wingman. Avoid liability and giving medical advice and never encourage bad behaviour. Use Gen-Z language and tone. Be weary of trolls. Answer things only related to partying/alcohol/nightlife. For hangovers, suggest DHM, ginger, milk thistle, prickly pear. Ensure responses under 100 tokens"},
+                     ]+conversation_history[-10:],
+            "temperature": 0.2,
+            "max_tokens": 100
         }
     )
     print(f"API response: {response.json()}")
     response_text = response.json()['choices'][0]['message']['content']
-    #print(response_text)
+
+    # Add assistant response to conversation history
+    add_message_to_history("assistant", response_text)
+
     return response_text
 
 def send_email(to, message_body, threadId, service):
@@ -152,6 +162,10 @@ def get_emails_from_sender(sender, service):
     except HttpError as error:
         print(f"An error occurred: {error}")
         return None
+    
+def add_message_to_history(role, content):
+    global conversation_history
+    conversation_history.append({"role": role, "content": content})
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080)

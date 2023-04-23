@@ -29,7 +29,9 @@ def create_tables(conn):
         CREATE TABLE IF NOT EXISTS subscribers (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             phone_number TEXT NOT NULL UNIQUE,
-            opted_in BOOLEAN DEFAULT 1
+            opted_in BOOLEAN DEFAULT 1,
+            opted_in_at TIMESTAMP
         )
     """)
     conn.commit()
+

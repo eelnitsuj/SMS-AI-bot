@@ -14,9 +14,7 @@ twilio_auth_token = os.environ['TWILIO_AUTH_TOKEN']
 twilio_phone_number = os.environ['TWILIO_PHONE_NUMBER']
 #create connection and table
 conn = create_connection('database.db')
-print("Creating tables...")
 create_tables(conn)
-print("Tables created.")
 
 
 @app.route('/', methods=['POST'])

@@ -85,7 +85,9 @@ def generate_response(text,message_history):
         "content": "You're the designated drinking buddy wingman. Avoid liability and giving medical advice and never encourage bad behaviour. Use Gen-Z language and tone. Be weary of trolls. Answer things only related to partying/alcohol/nightlife. For hangovers, suggest DHM, ginger, milk thistle, prickly pear. Ensure responses under 100 tokens"
     }]
     message.extend(message_history[-10:])
+    print(message)
     message.append({"role": "user", "content": text})
+    print(message)
     # API call with conversation history
     response = requests.post(
         'https://api.openai.com/v1/chat/completions',

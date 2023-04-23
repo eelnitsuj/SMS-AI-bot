@@ -73,7 +73,8 @@ def webhook():
         #Send Openai's response to gmail
         send_email(sender,response_text,threadId, service)
         return jsonify({'success': True}), 200
-def generate_response(text):
+    
+def generate_response(text,message_history):
     global conversation_history
 
     # Add user message to conversation history
@@ -86,11 +87,11 @@ def generate_response(text):
                 'Authorization': f'Bearer {openai_api_key}'},
         json={
             "model": "gpt-3.5-turbo",
-            "messages": conversation_history,
+            "messages": message_history,
             "messages": [{
                 "role": "system",
                 "content": "You're the designated drinking buddy wingman. Avoid liability and giving medical advice and never encourage bad behaviour. Use Gen-Z language and tone. Be weary of trolls. Answer things only related to partying/alcohol/nightlife. For hangovers, suggest DHM, ginger, milk thistle, prickly pear. Ensure responses under 100 tokens"},
-                     ]+conversation_history[-10:],
+                     ]+message_history[-10:],
             "temperature": 0.2,
             "max_tokens": 100
         }

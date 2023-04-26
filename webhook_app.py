@@ -2,7 +2,7 @@ import os
 import re
 import requests
 import base64
-import time
+import json
 from flask import Flask, request, jsonify
 from google.cloud import pubsub_v1
 from google.oauth2.credentials import Credentials
@@ -12,9 +12,12 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
 from google_auth_oauthlib.flow import InstalledAppFlow
+import redis
+
 app = Flask(__name__)
 
-start_time = time.time()
+redis_url = os.getenv('REDIS_URL', 'redis://localhost:6379')
+r = redis.from_url(redis_url)
 
 # Google Cloud project ID
 project_id = 'superbonsai-sms'
@@ -22,10 +25,41 @@ project_id = 'superbonsai-sms'
 # Cloud Pub/Sub topic name
 topic_name = 'SMS'
 
-# OpenAI API key from Heroku env
-openai_api_key = os.environ['openai_api_key']
-
 @app.route('/', methods=['POST'])
+def postscript_webhook():
+    if request.method == 'POST':
+        postscript_data = request.get_json()
+        sms_text = postscript_data.get('data', {}).get('event_data', {}).get('body', '')
+
+        # Send the SMS text to OpenAI API to get a response
+        response_text = generate_response(sms_text)
+
+        # Save the response_text in Redis with an expiration time (e.g., 300 seconds)
+        r.setex('response_text', 300, response_text)
+
+    return jsonify({'success': True}), 200
+
+@app.route('/gmail-webhook', methods=['POST'])
+def gmail_webhook():
+    if request.method == 'POST':
+        gmail_data = request.get_json()
+        message_data = gmail_data.get('message', {}).get('data', '')
+
+        if message_data:
+            decoded_data = base64.urlsafe_b64decode(message_data)
+            email_data = json.loads(decoded_data)
+            email_address = email_data.get('emailAddress', '')
+
+            # Retrieve the response_text from Redis
+            response_text = r.get('response_text')
+
+            if response_text:
+                # Send the response_text as an email reply to the email_address
+                send_email(email_address, response_text)
+
+    return jsonify({'success': True}), 200
+
+
 def webhook():
     if request.method == 'POST':
         # Extract the message from the request
@@ -74,6 +108,7 @@ def webhook():
         return jsonify({'success': True}), 200
 
 def generate_response(text, message_history):
+    openai_api_key = os.environ['openai_api_key']
     response = requests.post(
         'https://api.openai.com/v1/chat/completions',
         headers={'Content-Type': 'application/json', 

@@ -16,6 +16,7 @@ def webhook():
         #Grab phone number to reply
         phone_number = event_data.get('from_number') if event_data else None
         print(message)
+        print(phone_number)
         # Send the email message to OPENAI's API
         response_text = generate_response(message)
         print(response_text)
@@ -60,7 +61,8 @@ def send_text(phone_number, response_text):
         headers=headers,
         json=data
     )
-
+    print(response)
+    
     if response.status_code == 200:
         return 'Message sent successfully'
     else:

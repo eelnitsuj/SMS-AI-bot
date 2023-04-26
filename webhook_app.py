@@ -13,12 +13,14 @@ def webhook():
         # Grab message body from text
         event_data = payload.get('event_data')
         message = event_data.get('body') if event_data else None
+        #Grab phone number to reply
+        phone_number = event_data.get('from_number') if event_data else None
         print(message)
         # Send the email message to OPENAI's API
         response_text = generate_response(message)
         print(response_text)
         #Send Openai's response back to postscript
-        #send_text()
+        send_text(phone_number, response_text)
 
         return jsonify({'success': True}), 200
 
@@ -42,9 +44,27 @@ def generate_response(text):
     response_text = response.json()['choices'][0]['message']['content']
     return response_text
 
-def send_text():
-    #insert postscript API here
-    return 'true'
+def send_text(phone_number, response_text):
+    postscript_api_key = os.environ['postscript_api_key']
+    headers = {
+        'Content-Type': 'application/json',
+        'Authorization': f'Bearer {postscript_api_key}'
+    }
+    data = {
+        "phone": phone_number,
+        "message": response_text,
+    }
+
+    response = requests.post(
+        'https://api.postscript.io/v2/messages',
+        headers=headers,
+        json=data
+    )
+
+    if response.status_code == 200:
+        return 'Message sent successfully'
+    else:
+        return f'Error sending message: {response.text}'
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080)

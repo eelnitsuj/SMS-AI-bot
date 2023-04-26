@@ -5,9 +5,6 @@ from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
-# OpenAI API key from Heroku env
-openai_api_key = os.environ['openai_api_key']
-
 @app.route('/', methods=['POST'])
 def webhook():
     if request.method == 'POST':
@@ -28,6 +25,7 @@ def webhook():
         return jsonify({'success': True}), 200
 
 def generate_response(text):
+    openai_api_key = os.environ['openai_api_key']
     response = requests.post(
         'https://api.openai.com/v1/chat/completions',
         headers={'Content-Type': 'application/json', 
@@ -36,7 +34,7 @@ def generate_response(text):
                 "model": "gpt-3.5-turbo",
                 "messages": [{
                     "role": "system",
-                    "content": "You're the designated drinking buddy wingman. Avoid liability and giving medical advice and never encourage bad behaviour. Use Gen-Z language and tone. Be weary of trolls. Answer things only related to partying/alcohol/nightlife. For hangovers, suggest DHM, ginger, milk thistle, prickly pear. Ensure responses under 100 tokens. Here is past message history with the patient:" + message_history},
+                    "content": "You're the designated drinking buddy wingman. Avoid liability and giving medical advice and never encourage bad behaviour. Use Gen-Z language and tone. Be weary of trolls. Answer things only related to partying/alcohol/nightlife. For hangovers, suggest DHM, ginger, milk thistle, prickly pear. Ensure responses under 100 tokens"},
                              {"role": "user", "content": text}],
                 "temperature":0.2,
                 "max_tokens":100

@@ -47,22 +47,23 @@ def generate_response(text):
 
 def send_text(phone_number, response_text):
     postscript_api_key = os.environ['postscript_api_key']
+    url = "https://api.postscript.io/api/v2/message_requests"
     headers = {
-        'Content-Type': 'application/json',
-        'Authorization': f'Bearer {postscript_api_key}'
+        "accept": "application/json",
+        "content-type": "application/json",
+        "Authorization": f'Bearer {postscript_api_key}'
     }
-    data = {
-        "phone": phone_number,
-        "message": response_text,
+    payload = {
+        "phone":phone_number,
+        "body":response_text,
+        #"country": "US",
+        #"category": "promotional"
     }
 
-    response = requests.post(
-        'https://api.postscript.io/v2/messages',
-        headers=headers,
-        json=data
-    )
-    print(response)
-    
+    response = requests.post(url, json=payload, headers=headers)
+
+    print(response.text)
+
     if response.status_code == 200:
         return 'Message sent successfully'
     else:

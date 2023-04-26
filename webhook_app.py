@@ -27,7 +27,7 @@ def webhook():
 
         return jsonify({'success': True}), 200
 
-def generate_response(text, message_history):
+def generate_response(text):
     response = requests.post(
         'https://api.openai.com/v1/chat/completions',
         headers={'Content-Type': 'application/json', 

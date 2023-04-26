@@ -44,7 +44,6 @@ def generate_response(text, message_history):
     )
     print(f"API response: {response.json()}")
     response_text = response.json()['choices'][0]['message']['content']
-    #print(response_text)
     return response_text
 
 def send_text():

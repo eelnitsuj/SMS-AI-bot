@@ -1,26 +1,9 @@
 import os
 import re
 import requests
-import base64
-import time
 from flask import Flask, request, jsonify
-from google.cloud import pubsub_v1
-from google.oauth2.credentials import Credentials
-from googleapiclient.discovery import build
-from googleapiclient.errors import HttpError
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
-from email.mime.application import MIMEApplication
-from google_auth_oauthlib.flow import InstalledAppFlow
+
 app = Flask(__name__)
-
-start_time = time.time()
-
-# Google Cloud project ID
-project_id = 'superbonsai-sms'
-
-# Cloud Pub/Sub topic name
-topic_name = 'SMS'
 
 # OpenAI API key from Heroku env
 openai_api_key = os.environ['openai_api_key']
@@ -29,48 +12,19 @@ openai_api_key = os.environ['openai_api_key']
 def webhook():
     if request.method == 'POST':
         # Extract the message from the request
-        envelope = request.get_json()
-        
-        # Extract the sender email
-        sendercarrots = envelope.get('from', {})
-        sender = sendercarrots.get('email','')
-        #print(sender)
-
-        # Make sure it's not a reply
-        unacceptable_email = 'urbanboyclothes@gmail.com'
-        unacceptable_email_2 = 'alerts@mail.zapier.com'
-
-        if sender in (unacceptable_email, unacceptable_email_2, 'alerts+noreply@mail.zapier.com'):
-            return jsonify({'error': 'Stop talking to yourself!'}), 468
-
-
-        # Extract email content from the envelope
-        email_content = envelope.get('body_plain', '')
-        messages = remove_text(email_content)
-        print(messages)
-
-        #Make sure it's not a reaction text
-        invalid_starts = ["Loved “", "Liked “", "Disliked “", "Laughed “", "Emphasized “", "Questioned “"]
-        if any(messages.startswith(phrase) for phrase in invalid_starts):
-            return jsonify({'error': 'Just a reaction'}), 469
-
-        # Extract the threadId
-        threadId = envelope.get('thread_id', '')
-        #print(threadId)
-
-        if not envelope:
-            return jsonify({'error': 'Invalid request'}), 403
-        
-        #Authenticate GMAIL API
-        service=get_gmail()
-        #Grab the message history
-        message_history=get_emails_from_sender(sender, service)
-        print(sender)
-        print(message_history)
+        payload = request.json
+        print(payload)
+        # Grab message body from text
+        event_data = payload.get('event_data')
+        print(event_data)
+        message = event_data.get('body') if event_data else None
+        print(message)
         # Send the email message to OPENAI's API
-        response_text = generate_response(messages, message_history)
-        #Send Openai's response to gmail
-        send_email(sender,response_text,threadId, service)
+        response_text = generate_response(message)
+        print(response_text)
+        #Send Openai's response back to postscript
+        send_text()
+
         return jsonify({'success': True}), 200
 
 def generate_response(text, message_history):
@@ -93,65 +47,9 @@ def generate_response(text, message_history):
     #print(response_text)
     return response_text
 
-def send_email(to, message_body, threadId, service):
-    # Replace newline characters before creating the MIMEText object
-    message_body = message_body.replace('\n', ' ').replace('\r', '')
-
-    # Construct the message payload
-    message = MIMEText(message_body)
-    message['to'] = to
-    message['subject'] = ''
-    message['threadId'] = threadId
-
-    # Convert the MIMEText object to a raw string (base64 encoded)
-    raw_message = base64.urlsafe_b64encode(message.as_bytes()).decode('utf-8')
-
-    try:
-        # Send the reply message
-        send_message = service.users().messages().send(userId='me', body={'raw': raw_message, 'threadId': threadId}).execute()
-    except HttpError as error:
-        print(f"An error occurred: {error}")
-        send_message = None
-
-    return send_message
-
-def remove_text(input_string):
-    pattern = r'(?s)On .+?wrote:'
-    modified_string = re.sub(pattern, '', input_string)
-    while re.search(pattern, modified_string):
-        modified_string = re.sub(pattern, '', modified_string)
-    # Remove excessive newlines
-    modified_string = re.sub(r'\n{2,}', '\n', modified_string)
-    return modified_string
-
-def get_gmail():
-    creds = Credentials.from_authorized_user_info(info={
-        "client_id": os.environ['client_id'],
-        "client_secret": os.environ['client_secret'],
-        "refresh_token": os.environ['refresh_token'],
-        "token_uri": "https://oauth2.googleapis.com/token",
-    })
-    return build('gmail', 'v1', credentials=creds)
-
-def get_emails_from_sender(sender, service):
-    try:
-        query = f"from:{sender}"
-        response = service.users().messages().list(userId='me', q=query).execute()
-        messages = response.get('messages', [])
-        
-        email_snippets = []
-
-        for message in messages[:3]:
-            msg = service.users().messages().get(userId='me', id=message['id']).execute()
-            snippet = msg.get('snippet', '')
-            email_snippets.append(snippet)
-
-        email_conversations = "\n".join(email_snippets)
-        return email_conversations
-    
-    except HttpError as error:
-        print(f"An error occurred: {error}")
-        return None
+def send_text():
+    #insert postscript API here
+    return 'true'
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080)

@@ -10,17 +10,15 @@ def webhook():
     if request.method == 'POST':
         # Extract the message from the request
         payload = request.json
-        print(payload)
         # Grab message body from text
         event_data = payload.get('event_data')
-        print(event_data)
         message = event_data.get('body') if event_data else None
         print(message)
         # Send the email message to OPENAI's API
         response_text = generate_response(message)
         print(response_text)
         #Send Openai's response back to postscript
-        send_text()
+        #send_text()
 
         return jsonify({'success': True}), 200
 
@@ -40,7 +38,7 @@ def generate_response(text):
                 "max_tokens":100
         }
     )
-    print(f"API response: {response.json()}")
+    #print(f"API response: {response.json()}")
     response_text = response.json()['choices'][0]['message']['content']
     return response_text
 

@@ -15,7 +15,7 @@ def webhook():
         message = event_data.get('body') if event_data else None
 
          # Only process messages starting with "Bonsai"
-        if message and message.lower().startswith("Bonsai"):
+        if message and message.lower().startswith("bonsai"):
             # Grab phone number to reply
             phone_number = event_data.get('from_number') if event_data else None
             print(message)

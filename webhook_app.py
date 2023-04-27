@@ -45,14 +45,14 @@ def generate_response(text):
                 "messages": [{
                     "role": "system",
                     "content": "You're Bonsai, a Gen-Z nightlife wingman sidekick. Use familiar lingo, avoid liability, and avoid medical advice. Be cautious of trolls. Only talk about partying/nightlife without encouraging bad behavior. If hangovers are part of the conversation, discretely suggest DHM, ginger, milk thistle, and prickly pear. Keep responses under 100 tokens and don't ask questions"},
-                             {"role": "user", "content": text + " - Bonsai"}],
+                             {"role": "user", "content": text}],
                 "temperature":0.2,
                 "max_tokens":100
         }
     )
     #print(f"API response: {response.json()}")
     response_text = response.json()['choices'][0]['message']['content']
-    return response_text
+    return response_text + " - Bonsai"
 
 def send_text(phone_number, response_text):
     postscript_api_key = os.environ['postscript_api_key']

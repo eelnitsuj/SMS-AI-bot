@@ -13,20 +13,24 @@ def webhook():
         # Grab message body from text
         event_data = payload.get('event_data')
         message = event_data.get('body') if event_data else None
-
+        # Grab phone number to reply
+        phone_number = event_data.get('from_number') if event_data else None
+        print(message)
+        print(phone_number)
          # Only process messages starting with "Bonsai"
         if message and message.lower().startswith("bonsai"):
-            # Grab phone number to reply
-            phone_number = event_data.get('from_number') if event_data else None
-            print(message)
-            print(phone_number)
-            # Send the email message to OPENAI's API
-            response_text = generate_response(message)
-            print(response_text)
-            # Send Openai's response back to postscript
-            send_text(phone_number, response_text)
-
-            return jsonify({'success': True}), 200
+            # Filter messages that are too long
+            if len(message) > 200:
+                response_text = "Response is too long!"
+                send_text(phone_number, response_text)
+                return jsonify({'success': False, 'message': 'Message too long'}), 200
+            else:
+                # Send the email message to OPENAI's API
+                response_text = generate_response(message)
+                print(response_text)
+                # Send Openai's response back to postscript
+                send_text(phone_number, response_text)
+                return jsonify({'success': True}), 200
         else:
             return jsonify({'success': False, 'message': 'Ignored non-Bonsai message'}), 200
 

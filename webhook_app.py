@@ -102,6 +102,7 @@ def moderate(message):
     
     moderation_result = response.json()
     flagged = moderation_result['results'][0]['flagged']
+    print(flagged)
     return flagged
 
 if __name__ == '__main__':

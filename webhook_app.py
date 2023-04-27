@@ -28,6 +28,7 @@ def webhook():
                 return jsonify({'success': False, 'message': 'Message too long'}), 200
             elif moderate(message):
                 response_text = "Sorry, I can't process this message due to its content."
+                print(response_text)
                 send_text(phone_number, response_text)
                 return jsonify({'success': False, 'message': 'Inappropriate content'}), 200
             else:

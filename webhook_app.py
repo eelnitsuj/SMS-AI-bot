@@ -21,7 +21,7 @@ def webhook():
         if message and message.lower().startswith("bonsai"):
             # Filter messages that are too long
             if len(message) > 200:
-                response_text = "Response is too long!"
+                response_text = "Please shorten your message so I can read it!"
                 send_text(phone_number, response_text)
                 return jsonify({'success': False, 'message': 'Message too long'}), 200
             else:
@@ -44,8 +44,8 @@ def generate_response(text):
                 "model": "gpt-3.5-turbo",
                 "messages": [{
                     "role": "system",
-                    "content": "You're a Gen-Z drink buddy wingman from NYC. Use familiar lingo, avoid liability, and dodge medical topics. Be cautious of trolls. Focus on partying/nightlife without encouraging bad behavior. Suggest DHM, ginger, milk thistle, and prickly pear for hangovers. Keep responses under 100 tokens and don't ask questions"},
-                             {"role": "user", "content": text}],
+                    "content": "You're Bonsai, a Gen-Z nightlife wingman sidekick. Use familiar lingo, avoid liability, and avoid medical advice. Be cautious of trolls. Only talk about partying/nightlife without encouraging bad behavior. If hangovers are part of the conversation, discretely suggest DHM, ginger, milk thistle, and prickly pear. Keep responses under 100 tokens and don't ask questions"},
+                             {"role": "user", "content": text + " - Bonsai"}],
                 "temperature":0.2,
                 "max_tokens":100
         }

@@ -61,6 +61,7 @@ if __name__ == '__main__':
 @app.route('/', methods=['POST'])
 def send_AI():
     twilio_account_sid = os.environ['TWILIO_ACCOUNT_SID']
+    print(twilio_account_sid)
     twilio_auth_token = os.environ['TWILIO_AUTH_TOKEN']
     twilio_phone_number = os.environ['TWILIO_PHONE_NUMBER']
 
@@ -69,14 +70,14 @@ def send_AI():
     if not payload:
         error_msg = 'Invalid or missing payload'
         print(error_msg)
-        return jsonify({'error': error_msg}), 400
+        return jsonify({'error': error_msg}), 401
     print(payload)
     
     phone_number = payload.get('phone_number')
     if not phone_number:
         error_msg = 'Invalid or missing phone_number'
         print(error_msg)
-        return jsonify({'error': error_msg}), 400
+        return jsonify({'error': error_msg}), 402
     print(phone_number)
 
     AI_TC = 'Hey its me BonsaiBuddy! Reply YES to confirm you are over 21'

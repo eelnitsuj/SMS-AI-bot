@@ -66,8 +66,13 @@ def send_AI():
 
     # Extract the message from the request
     payload = request.json
+    if not payload:
+        return jsonify({'error': 'Invalid or missing payload'}), 400
     print(payload)
+    
     phone_number = payload.get('phone_number')
+    if not phone_number:
+        return jsonify({'error': 'Invalid or missing phone_number'}), 400
     print(phone_number)
 
     AI_TC = 'Hey its me BonsaiBuddy! Reply YES to confirm you are over 21'

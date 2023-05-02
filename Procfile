@@ -1,1 +1,1 @@
-web: gunicorn twilio:app
+web: gunicorn twilio_bot:app

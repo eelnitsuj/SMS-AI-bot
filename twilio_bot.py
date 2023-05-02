@@ -17,7 +17,7 @@ twilio_phone_number = os.environ['TWILIO_PHONE_NUMBER']
 # OpenAI API key from Heroku env
 openai_api_key = os.environ['openai_api_key']
 
-@app.route('/', methods=['POST'])
+@app.route('/a', methods=['POST'])
 def webhook():
     incoming_msg = request.form.get('Body')
     sender = request.form.get('From')
@@ -58,7 +58,7 @@ if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080)
     
 # Receive a payload from Postscript when they text "BonsaiBuddy" and reply with a text from our Twilio number
-@app.route('/bonsaibuddy', methods=['POST'])
+@app.route('/', methods=['POST'])
 def send_AI():
     twilio_account_sid = os.environ['TWILIO_ACCOUNT_SID']
     twilio_auth_token = os.environ['TWILIO_AUTH_TOKEN']
@@ -67,12 +67,16 @@ def send_AI():
     # Extract the message from the request
     payload = request.json
     if not payload:
-        return jsonify({'error': 'Invalid or missing payload'}), 400
+        error_msg = 'Invalid or missing payload'
+        print(error_msg)
+        return jsonify({'error': error_msg}), 400
     print(payload)
     
     phone_number = payload.get('phone_number')
     if not phone_number:
-        return jsonify({'error': 'Invalid or missing phone_number'}), 400
+        error_msg = 'Invalid or missing phone_number'
+        print(error_msg)
+        return jsonify({'error': error_msg}), 400
     print(phone_number)
 
     AI_TC = 'Hey its me BonsaiBuddy! Reply YES to confirm you are over 21'
@@ -84,3 +88,4 @@ def send_AI():
     )
 
     return jsonify({'success': True}), 200
+

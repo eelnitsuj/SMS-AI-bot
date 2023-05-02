@@ -58,7 +58,7 @@ if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080)
     
 # Receive a payload from Postscript when they text "BonsaiBuddy" and reply with a text from our Twilio number
-@app.route('/bonsaibuddy', methods=['POST'])
+@app.route('/bonsaibuddy', methods=['POST'], content_type='application/json')
 def send_AI():
     twilio_account_sid = os.environ['TWILIO_ACCOUNT_SID']
     twilio_auth_token = os.environ['TWILIO_AUTH_TOKEN']

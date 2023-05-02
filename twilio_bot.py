@@ -66,14 +66,16 @@ def send_AI():
 
     # Extract the message from the request
     payload = request.json
+    print(payload)
     phone_number = payload.get('phone_number')
+    print(phone_number)
 
     AI_TC = 'Hey its me BonsaiBuddy! Reply YES to confirm you are over 21'
     twilio_client = Client(twilio_account_sid, twilio_auth_token)
     twilio_client.messages.create(
         body=AI_TC,
         from_=twilio_phone_number,
-         to=phone_number
+        to=phone_number
     )
 
     return jsonify({'success': True}), 200

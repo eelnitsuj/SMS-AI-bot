@@ -62,12 +62,11 @@ if __name__ == '__main__':
 def send_AI():
     twilio_account_sid = os.environ['TWILIO_ACCOUNT_SID']
     twilio_auth_token = os.environ['TWILIO_AUTH_TOKEN']
-
-    # Twilio phone number
     twilio_phone_number = os.environ['TWILIO_PHONE_NUMBER']
+
     # Extract the message from the request
     payload = request.json
-    phone_number=payload.phone_number
+    phone_number = payload.get('phone_number')
 
     AI_TC = 'Hey its me BonsaiBuddy! Reply YES to confirm you are over 21'
     twilio_client = Client(twilio_account_sid, twilio_auth_token)

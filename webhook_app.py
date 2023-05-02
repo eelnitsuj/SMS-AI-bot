@@ -2,47 +2,38 @@ import os
 import re
 import requests
 from flask import Flask, request, jsonify
+from twilio.twiml.messaging_response import MessagingResponse
+from twilio.rest import Client
 
 app = Flask(__name__)
 
 @app.route('/', methods=['POST'])
 def webhook():
-    if request.method == 'POST':
-        # Extract the message from the request
-        payload = request.json
-        # Grab message body from text
-        event_data = payload.get('event_data')
-        message = event_data.get('body') if event_data else None
-        # Grab phone number to reply
-        phone_number = event_data.get('from_number') if event_data else None
-        print(message)
-        print(phone_number)
+    # Extract the message from the request
+    payload = request.json
+    # Grab message body from text
+    event_data = payload.get('event_data')
+    message = event_data.get('body') if event_data else None
+    # Grab phone number to reply
+    phone_number = event_data.get('from_number') if event_data else None
+    print(message)
+    print(phone_number)
 # Filters
-        # Only process messages starting with "Bonsai"
-        if message and message.lower().startswith("bonsai"):
-
-            # Filter messages that are too long
-            if len(message) > 200:
-                response_text = "Please shorten your message so I can read it!"
-                send_text(phone_number, response_text)
-                return jsonify({'success': False, 'message': 'Message too long'}), 200
-            elif moderate(message):
-                response_text = "Sorry, I can't process this message due to its content."
-                print(response_text)
-                send_text(phone_number, response_text)
-                return jsonify({'success': False, 'message': 'Inappropriate content'}), 200
-            else:
-                # Send the email message to OPENAI's API
-                response_text = generate_response(message)
-                print(response_text)
-                if not moderate(response_text):
-                    # Send Openai's response back to postscript
-                    send_text(phone_number, response_text)
-                    return jsonify({'success': True}), 200
-                else:
-                    return jsonify({'success': False, 'message': 'Inappropriate response'}), 200
+    # Only process messages starting with "Bonsai"
+    if message and message.lower().startswith("bonsai"):
+        # Filter messages that are too long
+        if len(message) > 200:
+            response_text = "Please shorten your message so I can read it!"
+            send_text(phone_number, response_text)
+            return jsonify({'success': False, 'message': 'Message too long'}), 200
         else:
-            return jsonify({'success': False, 'message': 'Ignored non-Bonsai message'}), 200
+            # Send the email message to OPENAI's API
+            response_text = generate_response(message)
+            print(response_text)
+            send_text_postscript(phone_number, response_text)
+            return jsonify({'success': True}), 200
+    else:
+        return jsonify({'success': False, 'message': 'Ignored non-Bonsai message'}), 200
 
 def generate_response(text):
     openai_api_key = os.environ['openai_api_key']
@@ -64,7 +55,7 @@ def generate_response(text):
     response_text = response.json()['choices'][0]['message']['content']
     return response_text + " - Bonsai"
 
-def send_text(phone_number, response_text):
+def send_text_postscript(phone_number, response_text):
     postscript_api_key = os.environ['postscript_api_key']
     url = "https://api.postscript.io/api/v2/message_requests"
     headers = {
@@ -86,25 +77,27 @@ def send_text(phone_number, response_text):
     else:
         return f'Error sending message: {response.text}'
 
-def moderate(message):
-    openai_api_key = os.environ['openai_api_key']
-    
-    response = requests.post(
-        'https://api.openai.com/v1/moderations',
-        headers={
-            'Content-Type': 'application/json',
-            'Authorization': f'Bearer {openai_api_key}'
-        },
-        json={
-            'input': message
-        }
-    )
-    
-    moderation_result = response.json()
-    flagged = moderation_result['results'][0]['flagged']
-    print(flagged)
-    return flagged
-
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080)
-    
+
+# Receive a payload from Postscript when they text "BonsaiBuddy" and reply with a text from our Twilio number
+@app.route('/bonsaibuddy', methods=['POST'])
+def send_AI():
+    twilio_account_sid = os.environ['TWILIO_ACCOUNT_SID']
+    twilio_auth_token = os.environ['TWILIO_AUTH_TOKEN']
+
+    # Twilio phone number
+    twilio_phone_number = os.environ['TWILIO_PHONE_NUMBER']
+    # Extract the message from the request
+    payload = request.json
+    phone_number=payload.phone_number
+
+    AI_TC = 'Hey its me BonsaiBuddy! Reply YES to confirm you are over 21'
+    twilio_client = Client(twilio_account_sid, twilio_auth_token)
+    twilio_client.messages.create(
+        body=AI_TC,
+        from_=twilio_phone_number,
+         to=phone_number
+    )
+
+    return jsonify({'success': True}), 200

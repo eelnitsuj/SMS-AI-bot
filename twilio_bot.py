@@ -61,12 +61,12 @@ if __name__ == '__main__':
 @app.route('/', methods=['POST'])
 def send_AI():
     twilio_account_sid = os.environ['TWILIO_ACCOUNT_SID']
-    print(twilio_account_sid)
     twilio_auth_token = os.environ['TWILIO_AUTH_TOKEN']
     twilio_phone_number = os.environ['TWILIO_PHONE_NUMBER']
 
     # Extract the message from the request
-    #payload = request.json
+    payload = request.json
+    print(payload)
     #phone_number = payload.get('phone_number')
     #print(phone_number)
 

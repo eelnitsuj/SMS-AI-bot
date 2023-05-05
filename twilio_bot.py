@@ -57,7 +57,7 @@ def generate_response(text):
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080)
     
-# Receive a payload from Postscript when they text "BonsaiBuddy" and reply with a text from our Twilio number
+# Receive a payload from Postscript when they text "Bonnie" and reply with a text from our Twilio number
 @app.route('/', methods=['POST'])
 def send_AI():
     twilio_account_sid = os.environ['TWILIO_ACCOUNT_SID']
@@ -66,26 +66,16 @@ def send_AI():
     twilio_phone_number = os.environ['TWILIO_PHONE_NUMBER']
 
     # Extract the message from the request
-    payload = request.json
-    if not payload:
-        error_msg = 'Invalid or missing payload'
-        print(error_msg)
-        return jsonify({'error': error_msg}), 401
-    print(payload)
-    
-    phone_number = payload.get('phone_number')
-    if not phone_number:
-        error_msg = 'Invalid or missing phone_number'
-        print(error_msg)
-        return jsonify({'error': error_msg}), 402
-    print(phone_number)
+    #payload = request.json
+    #phone_number = payload.get('phone_number')
+    #print(phone_number)
 
-    AI_TC = 'Hey its me BonsaiBuddy! Reply YES to confirm you are over 21'
+    AI_TC = 'Hey its me Bonnie'
     twilio_client = Client(twilio_account_sid, twilio_auth_token)
     twilio_client.messages.create(
         body=AI_TC,
         from_=twilio_phone_number,
-        to=phone_number
+        to=+16265326868
     )
 
     return jsonify({'success': True}), 200

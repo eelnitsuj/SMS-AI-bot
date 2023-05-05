@@ -1,1 +1,1 @@
-web: gunicorn testes:app
+web: gunicorn bonnie:app

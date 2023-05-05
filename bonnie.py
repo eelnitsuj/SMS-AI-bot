@@ -38,8 +38,11 @@ def webhook():
     incoming_msg = request.form.get('Body')
     sender = request.form.get('From')
     user_status = get_user_status(sender)
+    invalid_starts = ["Loved “", "Liked “", "Disliked “", "Laughed “", "Emphasized “", "Questioned “"]
+    if any(incoming_msg.startswith(phrase) for phrase in invalid_starts):
+            return jsonify({'error': 'Just a reaction'}), 469
     if incoming_msg.strip().lower() in ('start', 'unstop'):
-        return jsonify({'success': True}), 204
+        return jsonify({'error': 'default Twilio terms'}), 420
     else:
         if user_status is None:
             if incoming_msg.strip().lower() == 'agree':
@@ -59,7 +62,7 @@ def webhook():
 def generate_response(text,conversation_history):
     system_message = {
     "role": "system",
-    "content": "You're Bonnie, the video game AI companion of SuperBonsai world meant to acompany on quests in life. Avoid liability and giving medical advice and never encourage bad behaviour. Use Gen-Z language and tone. Be weary of trolls. Avoid controversy. Ensure responses under 100 tokens."
+    "content": "You're Bonnie, the video game AI companion of SuperBonsai world. Avoid liability and giving medical advice and never encourage bad behaviour. Use Gen-Z language and tone. Be weary of trolls. Avoid controversy. Ensure responses under 100 tokens."
     }
     user_message = {"role": "user", "content": text}
     messages = [system_message] + conversation_history + [user_message]

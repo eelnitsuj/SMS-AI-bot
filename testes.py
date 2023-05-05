@@ -2,7 +2,7 @@ import os
 from flask import Flask, request, jsonify
 from twilio.twiml.messaging_response import MessagingResponse
 from twilio.rest import Client
-
+app = Flask(__name__)
 @app.route('/', methods=['POST'])
 def send_AI():
     twilio_account_sid = os.environ['TWILIO_ACCOUNT_SID']

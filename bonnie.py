@@ -38,20 +38,17 @@ def webhook():
     incoming_msg = request.form.get('Body')
     sender = request.form.get('From')
     user_status = get_user_status(sender)
-
-    if user_status is None:
-        if incoming_msg.strip().lower() == 'agree':
-            reply(sender,"Thanks for agreeing! What can I help you with?")
-            set_user_status(sender, 'active')
-            return jsonify({'success': True}), 201
-        else:
-            reply(sender,"Bonnie here! Before we continue, reply AGREE to acknowledge our T&C to start chatting. Reply STOP to revoke anytime ")
-            return jsonify({'success': True}), 202
+    if incoming_msg.strip().lower() == 'start' | 'unstop':
+        return jsonify({'success': True}), 204
     else:
-        if incoming_msg.strip().lower() == 'stop':
-            reply(sender,"Bye bye and take care! Feel free to reply AGREE to continue chatting")
-            set_user_status(sender, None)
-            return jsonify({'success': True}), 203
+        if user_status is None:
+            if incoming_msg.strip().lower() == 'agree':
+                reply(sender,"Thanks for agreeing! What can I help you with?")
+                set_user_status(sender, 'active')
+                return jsonify({'success': True}), 201
+            else:
+                reply(sender,"Bonnie here! Before we continue, reply AGREE to acknowledge our T&C to start chatting. Reply STOP to revoke anytime ")
+                return jsonify({'success': True}), 202
         else:
             conversation_history = fetch_conversation_history(sender)
             response_text = generate_response(incoming_msg, conversation_history)
@@ -62,7 +59,7 @@ def webhook():
 def generate_response(text,conversation_history):
     system_message = {
     "role": "system",
-    "content": "You're Bonnie, the AI assistant of SuperBonsai world. Avoid liability and giving medical advice and never encourage bad behaviour. Use Gen-Z language and tone. Be weary of trolls. Don't answer any controversial topics. Ensure responses under 100 tokens."
+    "content": "You're Bonnie, the video game AI companion of SuperBonsai world meant to acompany on quests in life. Avoid liability and giving medical advice and never encourage bad behaviour. Use Gen-Z language and tone. Be weary of trolls. Avoid controversy. Ensure responses under 100 tokens."
     }
     user_message = {"role": "user", "content": text}
     messages = [system_message] + conversation_history + [user_message]
@@ -79,7 +76,7 @@ def generate_response(text,conversation_history):
     )
     print(f"API response: {response.json()}")
     response_text = response.json()['choices'][0]['message']['content']
-    return response_text
+    return response_text + " -Bonnie"
 def reply(sender,response_text):
     twilio_client = Client(twilio_account_sid, twilio_auth_token)
     twilio_client.messages.create(

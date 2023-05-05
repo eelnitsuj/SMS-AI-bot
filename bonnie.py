@@ -45,19 +45,24 @@ def webhook():
             set_user_status(sender, 'active')
             return jsonify({'success': True}), 201
         else:
-            reply(sender,"Bonnie here! Before we continue, reply AGREE to acknowledge our T&C to start chatting ")
+            reply(sender,"Bonnie here! Before we continue, reply AGREE to acknowledge our T&C to start chatting. Reply STOP to revoke anytime ")
             return jsonify({'success': True}), 202
     else:
-        conversation_history = fetch_conversation_history(sender)
-        response_text = generate_response(incoming_msg, conversation_history)
-        reply(sender, response_text)
+        if incoming_msg.strip().lower() == 'stop':
+            reply(sender,"Bye bye and take care! Feel free to reply AGREE to continue chatting")
+            set_user_status(sender, None)
+            return jsonify({'success': True}), 203
+        else:
+            conversation_history = fetch_conversation_history(sender)
+            response_text = generate_response(incoming_msg, conversation_history)
+            reply(sender, response_text)
 
-        return jsonify({'success': True}), 200
+            return jsonify({'success': True}), 200
 
 def generate_response(text,conversation_history):
     system_message = {
     "role": "system",
-    "content": "You're the designated drinking buddy wingman. Avoid liability and giving medical advice and never encourage bad behaviour. Use Gen-Z language and tone. Be weary of trolls. Answer things only related to partying/alcohol/nightlife. For hangovers, suggest DHM, ginger, milk thistle, prickly pear. Ensure responses under 100 tokens."
+    "content": "You're Bonnie, the AI assistant of SuperBonsai world. Avoid liability and giving medical advice and never encourage bad behaviour. Use Gen-Z language and tone. Be weary of trolls. Don't answer any controversial topics. Ensure responses under 100 tokens."
     }
     user_message = {"role": "user", "content": text}
     messages = [system_message] + conversation_history + [user_message]

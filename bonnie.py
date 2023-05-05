@@ -38,7 +38,7 @@ def webhook():
     incoming_msg = request.form.get('Body')
     sender = request.form.get('From')
     user_status = get_user_status(sender)
-    if incoming_msg.strip().lower() == 'start' | 'unstop':
+    if incoming_msg.strip().lower() in ('start', 'unstop'):
         return jsonify({'success': True}), 204
     else:
         if user_status is None:

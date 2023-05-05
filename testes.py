@@ -15,6 +15,7 @@ def send_AI():
     #phone_number = payload.get('phone_number')
     #print(phone_number)
     # Check the content type and extract the data accordingly
+    print(f'Incoming content type: {request.content_type}')
     if request.content_type == 'application/json':
         payload = request.json
     elif request.content_type == 'application/x-www-form-urlencoded':

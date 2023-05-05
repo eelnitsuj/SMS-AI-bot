@@ -15,10 +15,14 @@ def send_AI():
     #phone_number = payload.get('phone_number')
     #print(phone_number)
     # Check the content type and extract the data accordingly
-    print(f'Incoming content type: {request.content_type}')
-    if request.content_type == 'application/json':
-        payload = request.json
-    elif request.content_type == 'application/x-www-form-urlencoded':
+    content_type = request.content_type or 'application/json'
+
+    if content_type == 'application/json':
+        try:
+            payload = request.json
+        except ValueError:
+            return jsonify({'error': 'Invalid JSON'}), 400
+    elif content_type == 'application/x-www-form-urlencoded':
         payload = request.form
     else:
         return jsonify({'error': 'Invalid content type'}), 403

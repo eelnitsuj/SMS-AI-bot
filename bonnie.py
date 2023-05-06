@@ -144,3 +144,7 @@ def verify_password(username, password):
     if password == "cock" and username=="big":
         return True
     return False
+
+@auth.verify_password
+def verify_password_decorator(username, password):
+    return verify_password(username, password)

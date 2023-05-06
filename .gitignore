@@ -1,2 +1,3 @@
 *.json
 .env
+view_database.py

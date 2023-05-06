@@ -1,13 +1,15 @@
 import os
 import requests
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
+from flask_httpauth import HTTPBasicAuth
+import heroku3
 from twilio.twiml.messaging_response import MessagingResponse
 from twilio.rest import Client
 from database import get_connection, release_connection
 
 
 app = Flask(__name__)
-
+auth = HTTPBasicAuth()
 # Twilio Account SID and Auth Token
 twilio_account_sid = os.environ['TWILIO_ACCOUNT_SID']
 twilio_auth_token = os.environ['TWILIO_AUTH_TOKEN']
@@ -46,11 +48,11 @@ def webhook():
     else:
         if user_status is None:
             if incoming_msg.strip().lower() == 'agree':
-                reply(sender,"Thanks for agreeing! What can I help you with?")
+                reply(sender,"Thanks for agreeing! What can I help you with? -Bonnie")
                 set_user_status(sender, 'active')
                 return jsonify({'success': True}), 201
             else:
-                reply(sender,"Bonnie here! Before we continue, reply AGREE to acknowledge our T&C to start chatting. Reply STOP to revoke anytime ")
+                reply(sender,"Bonnie here! Before we continue, reply AGREE to acknowledge our T&C (hyperlink) to start chatting. -Bonnie")
                 return jsonify({'success': True}), 202
         else:
             conversation_history = fetch_conversation_history(sender)
@@ -62,7 +64,7 @@ def webhook():
 def generate_response(text,conversation_history):
     system_message = {
     "role": "system",
-    "content": "You're Bonnie, the video game AI companion of SuperBonsai world. Avoid liability and giving medical advice and never encourage bad behaviour. Use Gen-Z language and tone. Be weary of trolls. Avoid controversy. Ensure responses under 100 tokens."
+    "content": "You're Bonnie, the AI companion of SuperBonsai world. Avoid responses that are violent, hateful, sexual, dangerous, and avoid harmful bias and controversy. Use Gen-Z language and tone. Ensure responses under 100 tokens."
     }
     user_message = {"role": "user", "content": text}
     messages = [system_message] + conversation_history + [user_message]
@@ -122,5 +124,23 @@ def send_AI():
         from_=twilio_phone_number,
         to=+16265326868
     )
-
     return jsonify({'success': True}), 200
+
+@app.route('/logs')
+@auth.login_required
+def display_logs():
+    heroku_api_key = os.environ['HEROKU_API_KEY']
+    heroku_app_name = os.environ['HEROKU_APP_NAME']
+
+    heroku_conn = heroku3.from_key(heroku_api_key)
+    app = heroku_conn.apps()[heroku_app_name]
+
+    logs = app.get_log(lines=100)  # Retrieve the last 100 log lines
+
+    return render_template('logs.html', logs=logs)
+
+def verify_password(username, password):
+    # Replace these values with your desired username and password
+    if password == "cock":
+        return True
+    return False

@@ -141,6 +141,6 @@ def display_logs():
 
 def verify_password(username, password):
     # Replace these values with your desired username and password
-    if password == "cock":
+    if password == "cock" and username=="big":
         return True
     return False

@@ -6,3 +6,4 @@ twilio
 google-auth-oauthlib==1.0.0
 psycopg2
 Flask-HTTPAuth
+heroku3

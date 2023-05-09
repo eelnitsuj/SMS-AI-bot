@@ -130,7 +130,7 @@ def send_AI():
             print(f"ValueError when parsing as literal: {e}")
             payload = {}
     phone_number = payload.get('phone_number')
-
+    print ('+'+phone_number)
     AI_TC = 'Hi, I’m Bonnie! Before we can talk, you must read over the SuperBonsai Terms and Conditions (http://superbonsai.com/terms). Reply with ‘AGREE’, to accept the terms and conditions.\nLook forward to chatting! '
     twilio_client = Client(twilio_account_sid, twilio_auth_token)
     twilio_client.messages.create(

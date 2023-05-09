@@ -1,5 +1,6 @@
 import os
 import requests
+import json
 from flask import Flask, request, jsonify, render_template
 from flask_httpauth import HTTPBasicAuth
 import heroku3
@@ -111,11 +112,16 @@ if __name__ == '__main__':
 # Receive a payload from Postscript when they text "Bonnie" and reply with a text from our Twilio number
 @app.route('/', methods=['POST'])
 def send_AI():
-    # Extract the message from the request
-    payload = request.json
+    # Get the raw data of the request body as bytes and decode to string
+    raw_data = request.data
+    body = raw_data.decode('utf-8')
+
+    # Parse the string into a Python data structure (in this case, a dictionary)
+    payload = json.loads(body)
     print(payload)
-    #phone_number = payload.get('phone_number')
-    #print(phone_number)
+
+    phone_number = payload.get('phone_number')
+    print(phone_number)
 
     AI_TC = 'Hey its me Bonnie'
     twilio_client = Client(twilio_account_sid, twilio_auth_token)

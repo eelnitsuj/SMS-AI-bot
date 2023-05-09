@@ -1,5 +1,6 @@
 import os
 import requests
+from ast import literal_eval
 import json
 from flask import Flask, request, jsonify, render_template
 from flask_httpauth import HTTPBasicAuth
@@ -122,9 +123,12 @@ def send_AI():
     # Parse the string into a Python data structure (in this case, a dictionary)
     try:
         payload = json.loads(body)
-    except json.JSONDecodeError as e:
-        print(f"JSON decoding error: {e}")
-        payload = {}
+    except json.JSONDecodeError:
+        try:
+            payload = literal_eval(body)
+        except ValueError as e:
+            print(f"ValueError when parsing as literal: {e}")
+            payload = {}
 
     print(f"Parsed payload: {payload}")
 

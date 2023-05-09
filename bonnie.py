@@ -136,7 +136,7 @@ def send_AI():
     twilio_client.messages.create(
         body=AI_TC,
         from_=twilio_phone_number,
-        to=phone_number
+        to='+'+phone_number
     )
     return jsonify({'success': True}), 200
 

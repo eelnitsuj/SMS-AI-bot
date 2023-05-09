@@ -129,18 +129,14 @@ def send_AI():
         except ValueError as e:
             print(f"ValueError when parsing as literal: {e}")
             payload = {}
-
-    print(f"Parsed payload: {payload}")
-
     phone_number = payload.get('phone_number')
-    print(f"Phone number: {phone_number}")
 
-    AI_TC = 'Hey its me Bonnie'
+    AI_TC = 'Hi, I’m Bonnie! Before we can talk, you must read over the SuperBonsai Terms and Conditions (http://superbonsai.com/terms). Reply with ‘AGREE’, to accept the terms and conditions.\nLook forward to chatting! '
     twilio_client = Client(twilio_account_sid, twilio_auth_token)
     twilio_client.messages.create(
         body=AI_TC,
         from_=twilio_phone_number,
-        to=+16265326868
+        to=phone_number
     )
     return jsonify({'success': True}), 200
 

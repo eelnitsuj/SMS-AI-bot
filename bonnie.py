@@ -115,13 +115,13 @@ def send_AI():
     # Get the raw data of the request body as bytes and decode to string
     raw_data = request.data
     body = raw_data.decode('utf-8')
-
+    print(body)
     # Parse the string into a Python data structure (in this case, a dictionary)
-    payload = json.loads(body)
-    print(payload)
+    #payload = json.loads(body)
+    #print(payload)
 
-    phone_number = payload.get('phone_number')
-    print(phone_number)
+    #phone_number = payload.get('phone_number')
+    #print(phone_number)
 
     AI_TC = 'Hey its me Bonnie'
     twilio_client = Client(twilio_account_sid, twilio_auth_token)

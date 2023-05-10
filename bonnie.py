@@ -37,7 +37,7 @@ def set_user_status(phone_number, status):
     conn.commit()
     release_connection(conn)
 
-""" @app.route('/a', methods=['POST'])
+@app.route('/a', methods=['POST'])
 def webhook():
     incoming_msg = request.form.get('Body')
     sender = request.form.get('From')
@@ -61,7 +61,7 @@ def webhook():
             response_text = generate_response(incoming_msg, conversation_history)
             reply(sender, response_text)
 
-            return jsonify({'success': True}), 200 """
+            return jsonify({'success': True}), 200
 
 def generate_response(text,conversation_history):
     system_message = {

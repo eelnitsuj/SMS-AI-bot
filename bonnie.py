@@ -5,10 +5,8 @@ import json
 from flask import Flask, request, jsonify, render_template
 from flask_httpauth import HTTPBasicAuth
 import heroku3
-from twilio.twiml.messaging_response import MessagingResponse
 from twilio.rest import Client
 from database import get_connection, release_connection
-
 
 app = Flask(__name__)
 auth = HTTPBasicAuth()

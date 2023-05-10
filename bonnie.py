@@ -84,6 +84,7 @@ def generate_response(text,conversation_history):
     print(f"API response: {response.json()}")
     response_text = response.json()['choices'][0]['message']['content']
     return response_text + " -Bonnie"
+
 def reply(sender,response_text):
     twilio_client = Client(twilio_account_sid, twilio_auth_token)
     twilio_client.messages.create(
@@ -111,7 +112,7 @@ if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080)
 
 # Receive a payload from Postscript when they text "Bonnie" and reply with a text from our Twilio number
-@app.route('/', methods=['POST'])
+@app.route('/postscript', methods=['POST'])
 def send_AI():
     # Get the raw data of the request body as bytes and decode to string
     raw_data = request.data
